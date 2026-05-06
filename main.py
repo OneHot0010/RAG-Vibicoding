@@ -1,13 +1,19 @@
-"""Minimal MCP server entry point.
-
-The real server transport is introduced in later implementation phases.
-"""
+"""Minimal MCP server entry point."""
 
 from __future__ import annotations
 
+from core.settings import SettingsError, load_settings
+from observability.logger import get_logger
+
 
 def main() -> int:
-    """Return a successful status for the scaffolded entry point."""
+    """Load settings fail-fast before later server phases take over."""
+    logger = get_logger(__name__)
+    try:
+        load_settings()
+    except SettingsError as exc:
+        logger.error("Configuration error: %s", exc)
+        return 1
     return 0
 
 

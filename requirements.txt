@@ -2,3 +2,6 @@
 
 # Test runner used by the A2 testing baseline.
 pytest>=8.0
+
+# YAML settings parser used by the A3 configuration loader.
+PyYAML>=6.0

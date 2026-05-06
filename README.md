@@ -6,6 +6,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone contains the initia
 
 - `A1` scaffold: source tree, configuration placeholders, prompt placeholders, data/cache/log directories, and minimal entry point.
 - `A2` testing baseline: pytest configuration, test directory conventions, smoke import tests, and a minimal sample document fixture.
+- `A3` settings loader: YAML-backed dataclass settings, fail-fast validation, stderr logger, and startup config check.
 
 ## Quick Check
 
@@ -13,4 +14,5 @@ Spec-driven RAG and MCP knowledge hub. The current milestone contains the initia
 python -m compileall src
 python -c "import mcp_server; import core; import ingestion; import libs; import observability"
 .\.venv\Scripts\Activate.ps1; pytest -q
+.\.venv\Scripts\Activate.ps1; python main.py
 ```
