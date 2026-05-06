@@ -1,1 +1,4 @@
 # Runtime dependencies are introduced alongside their feature modules.
+
+# Test runner used by the A2 testing baseline.
+pytest>=8.0
