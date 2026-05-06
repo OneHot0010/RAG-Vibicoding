@@ -1,0 +1,1 @@
+"""Sparse encoding placeholder."""

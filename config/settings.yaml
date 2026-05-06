@@ -1,0 +1,43 @@
+llm:
+  provider: azure
+  model: gpt-4o
+
+embedding:
+  provider: openai
+  model: text-embedding-3-small
+
+vision_llm:
+  provider: azure
+  model: gpt-4o
+
+vector_store:
+  backend: chroma
+  persist_path: ./data/db/chroma
+
+retrieval:
+  sparse_backend: bm25
+  fusion_algorithm: rrf
+  top_k_dense: 20
+  top_k_sparse: 20
+  top_k_final: 10
+
+rerank:
+  backend: none
+  model: cross-encoder/ms-marco-MiniLM-L-6-v2
+  top_m: 30
+
+evaluation:
+  backends:
+    - custom
+  golden_test_set: ./tests/fixtures/golden_test_set.json
+
+observability:
+  enabled: true
+  log_file: ./logs/traces.jsonl
+
+dashboard:
+  enabled: true
+  port: 8501
+  traces_dir: ./logs
+  auto_refresh: true
+  refresh_interval: 5

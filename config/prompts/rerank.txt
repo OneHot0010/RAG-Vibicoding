@@ -1,0 +1,1 @@
+Rank the candidate chunks by relevance to the user query and return stable scores.
