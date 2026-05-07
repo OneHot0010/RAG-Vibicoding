@@ -1973,7 +1973,7 @@ dashboard:
 | B7.6 | ChromaStore 默认实现 | [x] | 2026-05-07 | ChromaStore local persistence + cosine query + filters + roundtrip integration tests |
 | B7.7 | LLM Reranker 实现 | [x] | 2026-05-07 | LLMReranker + prompt loading + ranked_ids schema validation + mock LLM tests |
 | B7.8 | Cross-Encoder Reranker 实现 | [x] | 2026-05-07 | CrossEncoderReranker + injectable scorer + top_m limiting + keyword fallback + mock scorer tests |
-| B8 | Vision LLM 抽象接口与工厂集成 | [ ] | | |
+| B8 | Vision LLM 抽象接口与工厂集成 | [x] | 2026-05-07 | BaseVisionLLM + ChatResponse + create_vision_llm registry + fake provider tests |
 | B9 | Azure Vision LLM 实现 | [ ] | | |
 
 #### 阶段 C：Ingestion Pipeline MVP
@@ -2067,7 +2067,7 @@ dashboard:
 | 阶段 | 总任务数 | 已完成 | 进度 |
 |------|---------|--------|------|
 | 阶段 A | 3 | 3 | 100% |
-| 阶段 B | 16 | 14 | 88% |
+| 阶段 B | 16 | 15 | 94% |
 | 阶段 C | 15 | 0 | 0% |
 | 阶段 D | 7 | 0 | 0% |
 | 阶段 E | 6 | 0 | 0% |
@@ -2075,7 +2075,7 @@ dashboard:
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **17** | **25%** |
+| **总计** | **68** | **18** | **26%** |
 
 
 ---
@@ -2304,7 +2304,7 @@ dashboard:
   - 提供超时/失败回退信号（供 Core 层 `D6` fallback 使用）。
 - **测试方法**：`pytest -q tests/unit/test_cross_encoder_reranker.py`。
 
-### B8：Vision LLM 抽象接口与工厂集成
+### B8：Vision LLM 抽象接口与工厂集成 ✅
 - **目标**：定义 `BaseVisionLLM` 抽象接口，扩展 `LLMFactory` 支持 Vision LLM 创建，为 C7 的 ImageCaptioner 提供底层抽象。
 - **修改文件**：
   - `src/libs/llm/base_vision_llm.py`

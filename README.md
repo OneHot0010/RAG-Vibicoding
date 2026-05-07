@@ -21,6 +21,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone contains the initia
 - `B7.6` ChromaStore default backend: local persistent vector store, cosine query, top-k, metadata filters, and roundtrip integration tests.
 - `B7.7` LLM reranker: prompt-backed ranked-id reranking, schema validation, omitted-candidate fallback, and mock LLM tests.
 - `B7.8` Cross-Encoder reranker: injectable scorer, top-M reranking, deterministic keyword fallback, factory registration, and mock scorer tests.
+- `B8` Vision LLM abstraction: `BaseVisionLLM`, normalized `ChatResponse`, independent vision provider registry, and fake-provider factory tests.
 
 ## Quick Check
 
