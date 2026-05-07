@@ -57,7 +57,7 @@
 | B6 | Evaluator 抽象接口与工厂 | [x] | 2026-05-07 | EvaluationCase/EvaluationResult + BaseEvaluator + EvaluatorFactory + CustomEvaluator(hit_rate/mrr) |
 | B7.1 | OpenAI-Compatible LLM 实现 | [x] | 2026-05-07 | OpenAILLM + AzureLLM + DeepSeekLLM + mock HTTP smoke tests |
 | B7.2 | Ollama LLM 实现 | [x] | 2026-05-07 | OllamaLLM /api/chat + factory registration + mock HTTP tests |
-| B7.3 | OpenAI & Azure Embedding 实现 | [ ] | | |
+| B7.3 | OpenAI & Azure Embedding 实现 | [x] | 2026-05-07 | OpenAIEmbedding + AzureEmbedding + batch embed + mock HTTP tests |
 | B7.4 | Ollama Embedding 实现 | [ ] | | |
 | B7.5 | Recursive Splitter 默认实现 | [ ] | | |
 | B7.6 | ChromaStore 默认实现 | [ ] | | |
@@ -157,7 +157,7 @@
 | 阶段 | 总任务数 | 已完成 | 进度 |
 |------|---------|--------|------|
 | 阶段 A | 3 | 3 | 100% |
-| 阶段 B | 16 | 8 | 50% |
+| 阶段 B | 16 | 9 | 56% |
 | 阶段 C | 15 | 0 | 0% |
 | 阶段 D | 7 | 0 | 0% |
 | 阶段 E | 6 | 0 | 0% |
@@ -165,7 +165,7 @@
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **11** | **16%** |
+| **总计** | **68** | **12** | **18%** |
 
 
 ---
@@ -325,7 +325,7 @@
   - 在连接失败/超时等场景下，抛出可读错误且不泄露敏感配置。
 - **测试方法**：`pytest -q tests/unit/test_ollama_llm.py`。
 
-### B7.3：OpenAI & Azure Embedding 实现
+### B7.3：OpenAI & Azure Embedding 实现 ✅
 - **目标**：补齐 `openai_embedding.py` 和 `azure_embedding.py`，支持 OpenAI 官方 API 和 Azure OpenAI 服务的 Embedding 调用，支持批量 `embed(texts)`，并可被 mock 测试。
 - **修改文件**：
   - `src/libs/embedding/openai_embedding.py`

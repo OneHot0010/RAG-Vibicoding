@@ -15,6 +15,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone contains the initia
 - `B6` Evaluator abstraction: `EvaluationCase`, `EvaluationResult`, `BaseEvaluator`, `EvaluatorFactory`, and deterministic `CustomEvaluator` metrics.
 - `B7.1` OpenAI-compatible LLMs: OpenAI, Azure OpenAI, and DeepSeek chat providers with mocked HTTP smoke tests.
 - `B7.2` Ollama LLM: local `/api/chat` provider, factory registration, mocked HTTP tests, and readable connection errors.
+- `B7.3` OpenAI/Azure embeddings: batch embedding providers, Azure deployment URL handling, factory registration, and mocked HTTP tests.
 
 ## Quick Check
 

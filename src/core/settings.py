@@ -30,6 +30,11 @@ class LLMSettings:
 class EmbeddingSettings:
     provider: str
     model: str
+    azure_endpoint: str | None = None
+    api_key: str | None = None
+    base_url: str | None = None
+    api_version: str | None = None
+    deployment: str | None = None
 
 
 @dataclass(frozen=True)
@@ -173,6 +178,11 @@ def _parse_settings(data: dict[str, Any]) -> Settings:
         embedding=EmbeddingSettings(
             provider=_required(data, "embedding.provider"),
             model=_required(data, "embedding.model"),
+            azure_endpoint=_optional(data, "embedding.azure_endpoint"),
+            api_key=_optional(data, "embedding.api_key"),
+            base_url=_optional(data, "embedding.base_url"),
+            api_version=_optional(data, "embedding.api_version"),
+            deployment=_optional(data, "embedding.deployment"),
         ),
         vision_llm=VisionLLMSettings(
             provider=_required(data, "vision_llm.provider"),
