@@ -27,6 +27,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone has completed the L
 - `C2` file integrity: SHA256 calculation, SQLite ingestion history, WAL mode, success/failed state tracking, and concurrent write tests.
 - `C3` PDF loading: `BaseLoader`, dependency-light `PdfLoader`, text extraction fallback, image placeholder metadata, and degradation tests.
 - `C4` document chunking: `DocumentChunker`, splitter factory integration, stable chunk ids, source offsets, source refs, and chunk-local image metadata.
+- `C5` chunk refinement: transform base contract, rule-based cleanup, optional LLM rewrite, fallback metadata, trace hooks, noisy fixtures, and opt-in real LLM test.
 
 ## Quick Check
 

@@ -1,0 +1,42 @@
+[
+  {
+    "name": "typical_noise_scenario",
+    "input": "Header\n\n  Important finding about retrieval.   \n\nPage 1 of 3\n---\nFooter",
+    "expected_contains": "Important finding about retrieval."
+  },
+  {
+    "name": "ocr_errors",
+    "input": "Draft\n\nThe kn0wledge base  has   duplicate spacing.\n\n2/8",
+    "expected_contains": "The kn0wledge base has duplicate spacing."
+  },
+  {
+    "name": "page_header_footer",
+    "input": "Confidential\n\nSection title\n\nPage 2\n\nUseful content.",
+    "expected_contains": "Section title\nUseful content."
+  },
+  {
+    "name": "excessive_whitespace",
+    "input": "alpha     beta\n\n\n\n gamma",
+    "expected_contains": "alpha beta\ngamma"
+  },
+  {
+    "name": "format_markers",
+    "input": "<!-- remove me -->\n\nKeep this\n\n====",
+    "expected_contains": "Keep this"
+  },
+  {
+    "name": "clean_text",
+    "input": "Clean paragraph with meaning.",
+    "expected_contains": "Clean paragraph with meaning."
+  },
+  {
+    "name": "code_blocks",
+    "input": "Intro\n\n```python\nx  =  1\nprint(x)\n```\n\nFooter",
+    "expected_contains": "```python\nx  =  1\nprint(x)\n```"
+  },
+  {
+    "name": "mixed_noise",
+    "input": "Header\n<!-- note -->\n\nA useful chunk.      It has value.\n\n________\n\nPage 9",
+    "expected_contains": "A useful chunk. It has value."
+  }
+]

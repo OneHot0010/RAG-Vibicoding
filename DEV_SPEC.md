@@ -1984,7 +1984,7 @@ dashboard:
 | C2 | 文件完整性检查（SHA256） | [x] | 2026-05-07 | SQLiteIntegrityChecker + SHA256 + WAL ingestion_history + success/failed tracking + concurrent write tests |
 | C3 | Loader 抽象基类与 PDF Loader | [x] | 2026-05-07 | BaseLoader + PdfLoader + fallback text extraction + image refs/placeholders + degradation tests |
 | C4 | Splitter 集成（调用 Libs） | [x] | 2026-05-07 | DocumentChunker + SplitterFactory integration + stable ids + offsets/source_ref + image metadata distribution tests |
-| C5 | Transform 基类 + ChunkRefiner | [ ] | | |
+| C5 | Transform 基类 + ChunkRefiner | [x] | 2026-05-07 | BaseTransform + ChunkRefiner rule cleanup + optional LLM rewrite + fallback metadata + trace hooks/tests |
 | C6 | MetadataEnricher | [ ] | | |
 | C7 | ImageCaptioner | [ ] | | |
 | C8 | DenseEncoder | [ ] | | |
@@ -2068,14 +2068,14 @@ dashboard:
 |------|---------|--------|------|
 | 阶段 A | 3 | 3 | 100% |
 | 阶段 B | 16 | 16 | 100% |
-| 阶段 C | 15 | 4 | 27% |
+| 阶段 C | 15 | 5 | 33% |
 | 阶段 D | 7 | 0 | 0% |
 | 阶段 E | 6 | 0 | 0% |
 | 阶段 F | 5 | 0 | 0% |
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **23** | **34%** |
+| **总计** | **68** | **24** | **35%** |
 
 
 ---
@@ -2442,7 +2442,7 @@ dashboard:
   - **类型契约**：输出的 Chunk 对象符合 `core/types.py` 中的 Chunk 定义（可序列化、字段完整）
 - **测试方法**：`pytest -q tests/unit/test_document_chunker.py`（使用 FakeSplitter 隔离测试，无需真实 LLM/外部依赖）。
 
-### C5：Transform 抽象基类 + ChunkRefiner（规则去噪 + LLM 增强）
+### C5：Transform 抽象基类 + ChunkRefiner（规则去噪 + LLM 增强） ✅
 - **目标**：定义 `BaseTransform`；实现 `ChunkRefiner`：先做规则去噪，再通过LLM进行智能增强，并提供失败降级机制（LLM异常时回退到规则结果，不阻塞 ingestion）。
 - **前置条件**（必须准备）：
   - **必须配置LLM**：在 `config/settings.yaml` 中配置可用的LLM（provider/model/api_key）
