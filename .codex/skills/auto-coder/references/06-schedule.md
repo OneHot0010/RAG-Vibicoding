@@ -73,7 +73,7 @@
 | C1 | 定义核心数据类型/契约（Document/Chunk/ChunkRecord） | [x] | 2026-05-07 | Document/Chunk/ChunkRecord + ImageRef + image placeholder helpers + JSON serialization tests |
 | C2 | 文件完整性检查（SHA256） | [x] | 2026-05-07 | SQLiteIntegrityChecker + SHA256 + WAL ingestion_history + success/failed tracking + concurrent write tests |
 | C3 | Loader 抽象基类与 PDF Loader | [x] | 2026-05-07 | BaseLoader + PdfLoader + fallback text extraction + image refs/placeholders + degradation tests |
-| C4 | Splitter 集成（调用 Libs） | [ ] | | |
+| C4 | Splitter 集成（调用 Libs） | [x] | 2026-05-07 | DocumentChunker + SplitterFactory integration + stable ids + offsets/source_ref + image metadata distribution tests |
 | C5 | Transform 基类 + ChunkRefiner | [ ] | | |
 | C6 | MetadataEnricher | [ ] | | |
 | C7 | ImageCaptioner | [ ] | | |
@@ -158,14 +158,14 @@
 |------|---------|--------|------|
 | 阶段 A | 3 | 3 | 100% |
 | 阶段 B | 16 | 16 | 100% |
-| 阶段 C | 15 | 3 | 20% |
+| 阶段 C | 15 | 4 | 27% |
 | 阶段 D | 7 | 0 | 0% |
 | 阶段 E | 6 | 0 | 0% |
 | 阶段 F | 5 | 0 | 0% |
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **22** | **32%** |
+| **总计** | **68** | **23** | **34%** |
 
 
 ---
@@ -499,7 +499,7 @@
   - 验证纯文本PDF能正常解析
   - 验证带图片PDF能提取图片并正确插入占位符
 
-### C4：Splitter 集成（调用 Libs）
+### C4：Splitter 集成（调用 Libs） ✅
 - **目标**：实现 Chunking 模块作为 `libs.splitter` 和 Ingestion Pipeline 之间的**适配器层**，完成 Document→Chunks 的业务对象转换。
 - **核心职责（DocumentChunker 相比 libs.splitter 的增值）**：
   - **职责边界说明**：

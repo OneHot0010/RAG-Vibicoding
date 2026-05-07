@@ -26,6 +26,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone has completed the L
 - `C1` core data contracts: `Document`, `Chunk`, `ChunkRecord`, `ImageRef`, image placeholder helpers, metadata validation, and JSON-stable serialization tests.
 - `C2` file integrity: SHA256 calculation, SQLite ingestion history, WAL mode, success/failed state tracking, and concurrent write tests.
 - `C3` PDF loading: `BaseLoader`, dependency-light `PdfLoader`, text extraction fallback, image placeholder metadata, and degradation tests.
+- `C4` document chunking: `DocumentChunker`, splitter factory integration, stable chunk ids, source offsets, source refs, and chunk-local image metadata.
 
 ## Quick Check
 
