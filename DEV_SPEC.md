@@ -1989,7 +1989,7 @@ dashboard:
 | C7 | ImageCaptioner | [x] | 2026-05-07 | ImageCaptioner + optional Vision LLM captions + metadata writeback + disabled/error fallback tests |
 | C8 | DenseEncoder | [x] | 2026-05-07 | DenseEncoder + EmbeddingFactory integration + ChunkRecord dense vectors + validation/trace tests |
 | C9 | SparseEncoder | [x] | 2026-05-07 | SparseEncoder + BM25-ready term frequencies + document_frequency stats + trace/edge-case tests |
-| C10 | BatchProcessor | [ ] | | |
+| C10 | BatchProcessor | [x] | 2026-05-07 | BatchProcessor + stable batching + dense/sparse orchestration + per-batch timing/trace tests |
 | C11 | BM25Indexer（倒排索引+IDF计算） | [ ] | | |
 | C12 | VectorUpserter（幂等upsert） | [ ] | | |
 | C13 | ImageStorage（图片存储+SQLite索引） | [ ] | | |
@@ -2068,14 +2068,14 @@ dashboard:
 |------|---------|--------|------|
 | 阶段 A | 3 | 3 | 100% |
 | 阶段 B | 16 | 16 | 100% |
-| 阶段 C | 15 | 9 | 60% |
+| 阶段 C | 15 | 10 | 67% |
 | 阶段 D | 7 | 0 | 0% |
 | 阶段 E | 6 | 0 | 0% |
 | 阶段 F | 5 | 0 | 0% |
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **28** | **41%** |
+| **总计** | **68** | **29** | **43%** |
 
 
 ---
@@ -2555,7 +2555,7 @@ dashboard:
 - **验收标准**：输出结构可用于 bm25_indexer；对空文本有明确行为。
 - **测试方法**：`pytest -q tests/unit/test_sparse_encoder.py`。
 
-### C10：BatchProcessor（批处理编排）
+### C10：BatchProcessor（批处理编排） ✅
 - **目标**：实现 `batch_processor.py`：将 chunks 分 batch，驱动 dense/sparse 编码，记录批次耗时（为 trace 预留）。
 - **修改文件**：
   - `src/ingestion/embedding/batch_processor.py`
