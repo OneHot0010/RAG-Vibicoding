@@ -71,7 +71,7 @@
 | 任务编号 | 任务名称 | 状态 | 完成日期 | 备注 |
 |---------|---------|------|---------|------|
 | C1 | 定义核心数据类型/契约（Document/Chunk/ChunkRecord） | [x] | 2026-05-07 | Document/Chunk/ChunkRecord + ImageRef + image placeholder helpers + JSON serialization tests |
-| C2 | 文件完整性检查（SHA256） | [ ] | | |
+| C2 | 文件完整性检查（SHA256） | [x] | 2026-05-07 | SQLiteIntegrityChecker + SHA256 + WAL ingestion_history + success/failed tracking + concurrent write tests |
 | C3 | Loader 抽象基类与 PDF Loader | [ ] | | |
 | C4 | Splitter 集成（调用 Libs） | [ ] | | |
 | C5 | Transform 基类 + ChunkRefiner | [ ] | | |
@@ -158,14 +158,14 @@
 |------|---------|--------|------|
 | 阶段 A | 3 | 3 | 100% |
 | 阶段 B | 16 | 16 | 100% |
-| 阶段 C | 15 | 1 | 7% |
+| 阶段 C | 15 | 2 | 13% |
 | 阶段 D | 7 | 0 | 0% |
 | 阶段 E | 6 | 0 | 0% |
 | 阶段 F | 5 | 0 | 0% |
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **20** | **29%** |
+| **总计** | **68** | **21** | **31%** |
 
 
 ---
@@ -456,7 +456,7 @@
   - **文本中图片占位符规范**：在 `Document.text` 中，图片位置使用 `[IMAGE: {image_id}]` 格式标记。
 - **测试方法**：`pytest -q tests/unit/test_core_types.py`。
 
-### C2：文件完整性检查（SHA256）
+### C2：文件完整性检查（SHA256） ✅
 - **目标**：在Libs中实现 `file_integrity.py`：计算文件 hash，并提供“是否跳过”的判定接口（使用 SQLite 作为默认存储，支持后续替换为 Redis/PostgreSQL）。
 - **修改文件**：
   - `src/libs/loader/file_integrity.py`

@@ -24,6 +24,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone has completed the L
 - `B8` Vision LLM abstraction: `BaseVisionLLM`, normalized `ChatResponse`, independent vision provider registry, and fake-provider factory tests.
 - `B9` Azure Vision LLM: Azure multimodal chat payloads, file/bytes image encoding, deployment URLs, factory registration, and mocked HTTP tests.
 - `C1` core data contracts: `Document`, `Chunk`, `ChunkRecord`, `ImageRef`, image placeholder helpers, metadata validation, and JSON-stable serialization tests.
+- `C2` file integrity: SHA256 calculation, SQLite ingestion history, WAL mode, success/failed state tracking, and concurrent write tests.
 
 ## Quick Check
 
