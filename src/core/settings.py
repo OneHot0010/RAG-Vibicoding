@@ -41,6 +41,11 @@ class EmbeddingSettings:
 class VisionLLMSettings:
     provider: str
     model: str
+    azure_endpoint: str | None = None
+    api_key: str | None = None
+    base_url: str | None = None
+    api_version: str | None = None
+    deployment: str | None = None
 
 
 @dataclass(frozen=True)
@@ -187,6 +192,11 @@ def _parse_settings(data: dict[str, Any]) -> Settings:
         vision_llm=VisionLLMSettings(
             provider=_required(data, "vision_llm.provider"),
             model=_required(data, "vision_llm.model"),
+            azure_endpoint=_optional(data, "vision_llm.azure_endpoint"),
+            api_key=_optional(data, "vision_llm.api_key"),
+            base_url=_optional(data, "vision_llm.base_url"),
+            api_version=_optional(data, "vision_llm.api_version"),
+            deployment=_optional(data, "vision_llm.deployment"),
         ),
         splitter=SplitterSettings(
             strategy=_required(data, "splitter.strategy"),

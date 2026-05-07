@@ -1,6 +1,7 @@
 """LLM abstractions, providers, and factory helpers."""
 
 from libs.llm.azure_llm import AzureLLM
+from libs.llm.azure_vision_llm import AzureVisionLLM
 from libs.llm.base_llm import BaseLLM, ChatMessage
 from libs.llm.base_vision_llm import BaseVisionLLM, ChatResponse
 from libs.llm.deepseek_llm import DeepSeekLLM
@@ -12,9 +13,11 @@ LLMFactory.register("openai", OpenAILLM)
 LLMFactory.register("azure", AzureLLM)
 LLMFactory.register("deepseek", DeepSeekLLM)
 LLMFactory.register("ollama", OllamaLLM)
+LLMFactory.register_vision("azure", AzureVisionLLM)
 
 __all__ = [
     "AzureLLM",
+    "AzureVisionLLM",
     "BaseLLM",
     "BaseVisionLLM",
     "ChatMessage",

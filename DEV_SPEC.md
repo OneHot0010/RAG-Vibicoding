@@ -1974,7 +1974,7 @@ dashboard:
 | B7.7 | LLM Reranker 实现 | [x] | 2026-05-07 | LLMReranker + prompt loading + ranked_ids schema validation + mock LLM tests |
 | B7.8 | Cross-Encoder Reranker 实现 | [x] | 2026-05-07 | CrossEncoderReranker + injectable scorer + top_m limiting + keyword fallback + mock scorer tests |
 | B8 | Vision LLM 抽象接口与工厂集成 | [x] | 2026-05-07 | BaseVisionLLM + ChatResponse + create_vision_llm registry + fake provider tests |
-| B9 | Azure Vision LLM 实现 | [ ] | | |
+| B9 | Azure Vision LLM 实现 | [x] | 2026-05-07 | AzureVisionLLM + image data URLs + deployment URL + factory registration + mock HTTP tests |
 
 #### 阶段 C：Ingestion Pipeline MVP
 
@@ -2067,7 +2067,7 @@ dashboard:
 | 阶段 | 总任务数 | 已完成 | 进度 |
 |------|---------|--------|------|
 | 阶段 A | 3 | 3 | 100% |
-| 阶段 B | 16 | 15 | 94% |
+| 阶段 B | 16 | 16 | 100% |
 | 阶段 C | 15 | 0 | 0% |
 | 阶段 D | 7 | 0 | 0% |
 | 阶段 E | 6 | 0 | 0% |
@@ -2075,7 +2075,7 @@ dashboard:
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **18** | **26%** |
+| **总计** | **68** | **19** | **28%** |
 
 
 ---
@@ -2319,7 +2319,7 @@ dashboard:
   - 接口设计支持图片预处理（压缩、格式转换）的扩展点。
 - **测试方法**：`pytest -q tests/unit/test_vision_llm_factory.py`。
 
-### B9：Azure Vision LLM 实现
+### B9：Azure Vision LLM 实现 ✅
 - **目标**：实现 `AzureVisionLLM`，支持通过 Azure OpenAI 调用 GPT-4o/GPT-4-Vision-Preview 进行图像理解。
 - **修改文件**：
   - `src/libs/llm/azure_vision_llm.py`
