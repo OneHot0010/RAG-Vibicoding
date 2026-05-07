@@ -10,6 +10,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone contains the initia
 - `B1` LLM abstraction: `BaseLLM`, normalized chat messages, registry-backed `LLMFactory`, and fake-provider routing tests.
 - `B2` Embedding abstraction: `BaseEmbedding`, registry-backed `EmbeddingFactory`, and stable fake-vector routing tests.
 - `B3` Splitter abstraction: `BaseSplitter`, splitter settings, registry-backed `SplitterFactory`, and fake-strategy routing tests.
+- `B4` VectorStore abstraction: `VectorRecord`, `VectorQueryResult`, `BaseVectorStore`, registry-backed `VectorStoreFactory`, and contract tests.
 
 ## Quick Check
 
