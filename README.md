@@ -33,6 +33,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone has completed the L
 - `C8` dense encoding: `DenseEncoder`, embedding factory integration, `ChunkRecord` dense vectors, dimension validation, trace hooks, and mock embedding tests.
 - `C9` sparse encoding: BM25-ready term-frequency `ChunkRecord`s, document frequency stats, average doc length, token filtering, trace hooks, and edge-case tests.
 - `C10` batch processing: stable chunk batching, dense/sparse encoding orchestration, flattened records, per-batch timing, trace events, and serialization tests.
+- `C11` BM25 indexing: inverted index build/add, IDF calculation, stable query ranking, JSON persistence/load, trace hooks, and roundtrip tests.
 
 ## Quick Check
 
