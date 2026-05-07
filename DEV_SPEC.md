@@ -1987,7 +1987,7 @@ dashboard:
 | C5 | Transform 基类 + ChunkRefiner | [x] | 2026-05-07 | BaseTransform + ChunkRefiner rule cleanup + optional LLM rewrite + fallback metadata + trace hooks/tests |
 | C6 | MetadataEnricher | [x] | 2026-05-07 | MetadataEnricher + rule title/summary/tags + optional structured LLM metadata + fallback/trace tests |
 | C7 | ImageCaptioner | [x] | 2026-05-07 | ImageCaptioner + optional Vision LLM captions + metadata writeback + disabled/error fallback tests |
-| C8 | DenseEncoder | [ ] | | |
+| C8 | DenseEncoder | [x] | 2026-05-07 | DenseEncoder + EmbeddingFactory integration + ChunkRecord dense vectors + validation/trace tests |
 | C9 | SparseEncoder | [ ] | | |
 | C10 | BatchProcessor | [ ] | | |
 | C11 | BM25Indexer（倒排索引+IDF计算） | [ ] | | |
@@ -2068,14 +2068,14 @@ dashboard:
 |------|---------|--------|------|
 | 阶段 A | 3 | 3 | 100% |
 | 阶段 B | 16 | 16 | 100% |
-| 阶段 C | 15 | 7 | 47% |
+| 阶段 C | 15 | 8 | 53% |
 | 阶段 D | 7 | 0 | 0% |
 | 阶段 E | 6 | 0 | 0% |
 | 阶段 F | 5 | 0 | 0% |
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **26** | **38%** |
+| **总计** | **68** | **27** | **40%** |
 
 
 ---
@@ -2539,7 +2539,7 @@ dashboard:
   - 降级模式：当配置禁用或异常时，chunk 保留 image_refs，但不生成 caption 且标记 `has_unprocessed_images`。
 - **测试方法**：`pytest -q tests/unit/test_image_captioner_fallback.py`。
 
-### C8：DenseEncoder（依赖 libs.embedding）
+### C8：DenseEncoder（依赖 libs.embedding） ✅
 - **目标**：实现 `dense_encoder.py`，把 chunks.text 批量送入 `BaseEmbedding`。
 - **修改文件**：
   - `src/ingestion/embedding/dense_encoder.py`
