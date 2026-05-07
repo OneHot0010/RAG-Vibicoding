@@ -25,6 +25,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone has completed the L
 - `B9` Azure Vision LLM: Azure multimodal chat payloads, file/bytes image encoding, deployment URLs, factory registration, and mocked HTTP tests.
 - `C1` core data contracts: `Document`, `Chunk`, `ChunkRecord`, `ImageRef`, image placeholder helpers, metadata validation, and JSON-stable serialization tests.
 - `C2` file integrity: SHA256 calculation, SQLite ingestion history, WAL mode, success/failed state tracking, and concurrent write tests.
+- `C3` PDF loading: `BaseLoader`, dependency-light `PdfLoader`, text extraction fallback, image placeholder metadata, and degradation tests.
 
 ## Quick Check
 
