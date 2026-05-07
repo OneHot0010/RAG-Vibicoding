@@ -14,6 +14,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone contains the initia
 - `B5` Reranker abstraction: `RerankCandidate`, `RerankResult`, `BaseReranker`, `NoneReranker`, and registry-backed `RerankerFactory`.
 - `B6` Evaluator abstraction: `EvaluationCase`, `EvaluationResult`, `BaseEvaluator`, `EvaluatorFactory`, and deterministic `CustomEvaluator` metrics.
 - `B7.1` OpenAI-compatible LLMs: OpenAI, Azure OpenAI, and DeepSeek chat providers with mocked HTTP smoke tests.
+- `B7.2` Ollama LLM: local `/api/chat` provider, factory registration, mocked HTTP tests, and readable connection errors.
 
 ## Quick Check
 

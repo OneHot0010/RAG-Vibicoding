@@ -1966,7 +1966,7 @@ dashboard:
 | B5 | Reranker 抽象接口与工厂（含 None 回退） | [x] | 2026-05-07 | RerankCandidate/RerankResult + BaseReranker + NoneReranker + RerankerFactory |
 | B6 | Evaluator 抽象接口与工厂 | [x] | 2026-05-07 | EvaluationCase/EvaluationResult + BaseEvaluator + EvaluatorFactory + CustomEvaluator(hit_rate/mrr) |
 | B7.1 | OpenAI-Compatible LLM 实现 | [x] | 2026-05-07 | OpenAILLM + AzureLLM + DeepSeekLLM + mock HTTP smoke tests |
-| B7.2 | Ollama LLM 实现 | [ ] | | |
+| B7.2 | Ollama LLM 实现 | [x] | 2026-05-07 | OllamaLLM /api/chat + factory registration + mock HTTP tests |
 | B7.3 | OpenAI & Azure Embedding 实现 | [ ] | | |
 | B7.4 | Ollama Embedding 实现 | [ ] | | |
 | B7.5 | Recursive Splitter 默认实现 | [ ] | | |
@@ -2067,7 +2067,7 @@ dashboard:
 | 阶段 | 总任务数 | 已完成 | 进度 |
 |------|---------|--------|------|
 | 阶段 A | 3 | 3 | 100% |
-| 阶段 B | 16 | 7 | 44% |
+| 阶段 B | 16 | 8 | 50% |
 | 阶段 C | 15 | 0 | 0% |
 | 阶段 D | 7 | 0 | 0% |
 | 阶段 E | 6 | 0 | 0% |
@@ -2075,7 +2075,7 @@ dashboard:
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **10** | **15%** |
+| **总计** | **68** | **11** | **16%** |
 
 
 ---
@@ -2225,7 +2225,7 @@ dashboard:
   - `chat(messages)` 对输入 shape 校验清晰，异常信息可读（包含 provider 与错误类型）。
 - **测试方法**：`pytest -q tests/unit/test_llm_providers_smoke.py`。
 
-### B7.2：Ollama LLM（本地后端）
+### B7.2：Ollama LLM（本地后端） ✅
 - **目标**：补齐 `ollama_llm.py`，支持本地 HTTP endpoint（默认 `base_url` + `model`），并可被 mock 测试。
 - **修改文件**：
   - `src/libs/llm/ollama_llm.py`
