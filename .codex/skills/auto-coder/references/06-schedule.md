@@ -82,7 +82,7 @@
 | C10 | BatchProcessor | [x] | 2026-05-07 | BatchProcessor + stable batching + dense/sparse orchestration + per-batch timing/trace tests |
 | C11 | BM25Indexer（倒排索引+IDF计算） | [x] | 2026-05-07 | BM25Indexer + inverted index + IDF + query ranking + JSON persistence/load tests |
 | C12 | VectorUpserter（幂等upsert） | [x] | 2026-05-07 | VectorUpserter + deterministic content ids + VectorStore upsert + idempotency/order/trace tests |
-| C13 | ImageStorage（图片存储+SQLite索引） | [ ] | | |
+| C13 | ImageStorage（图片存储+SQLite索引） | [x] | 2026-05-07 | ImageStorage + SQLite image_index + WAL + file persistence + collection/doc_hash listing/deletion tests |
 | C14 | Pipeline 编排（MVP 串起来） | [ ] | | |
 | C15 | 脚本入口 ingest.py | [ ] | | |
 
@@ -158,14 +158,14 @@
 |------|---------|--------|------|
 | 阶段 A | 3 | 3 | 100% |
 | 阶段 B | 16 | 16 | 100% |
-| 阶段 C | 15 | 12 | 80% |
+| 阶段 C | 15 | 13 | 87% |
 | 阶段 D | 7 | 0 | 0% |
 | 阶段 E | 6 | 0 | 0% |
 | 阶段 F | 5 | 0 | 0% |
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **31** | **46%** |
+| **总计** | **68** | **32** | **47%** |
 
 
 ---
@@ -696,7 +696,7 @@
 - **测试方法**：`pytest -q tests/unit/test_vector_upserter_idempotency.py`。
 - **备注**：本任务完成Dense路径的最后一环，为D2 (DenseRetriever) 提供可查询的向量数据库。
 
-### C13：ImageStorage（图片文件存储与索引表契约）
+### C13：ImageStorage（图片文件存储与索引表契约） ✅
 - **目标**：实现 `image_storage.py`：保存图片到 `data/images/{collection}/`，并使用 **SQLite** 记录 image_id→path 映射。
 - **修改文件**：
   - `src/ingestion/storage/image_storage.py`

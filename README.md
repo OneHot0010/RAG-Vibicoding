@@ -35,6 +35,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone has completed the L
 - `C10` batch processing: stable chunk batching, dense/sparse encoding orchestration, flattened records, per-batch timing, trace events, and serialization tests.
 - `C11` BM25 indexing: inverted index build/add, IDF calculation, stable query ranking, JSON persistence/load, trace hooks, and roundtrip tests.
 - `C12` vector upsert: deterministic content-based vector ids, VectorStore upsert adapter, idempotent writes, batch ordering, trace hooks, and mock store tests.
+- `C13` image storage: SQLite image index, WAL mode, image file persistence, collection/doc_hash listing, deletion, trace hooks, and concurrency tests.
 
 ## Quick Check
 
