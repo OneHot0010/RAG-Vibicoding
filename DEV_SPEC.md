@@ -1964,7 +1964,7 @@ dashboard:
 | B3 | Splitter 抽象接口与工厂 | [x] | 2026-05-07 | BaseSplitter + SplitterSettings + SplitterFactory 注册路由 + Fake splitter 单元测试 |
 | B4 | VectorStore 抽象接口与工厂 | [x] | 2026-05-07 | VectorRecord/VectorQueryResult + BaseVectorStore + VectorStoreFactory + 契约测试 |
 | B5 | Reranker 抽象接口与工厂（含 None 回退） | [x] | 2026-05-07 | RerankCandidate/RerankResult + BaseReranker + NoneReranker + RerankerFactory |
-| B6 | Evaluator 抽象接口与工厂 | [ ] | | |
+| B6 | Evaluator 抽象接口与工厂 | [x] | 2026-05-07 | EvaluationCase/EvaluationResult + BaseEvaluator + EvaluatorFactory + CustomEvaluator(hit_rate/mrr) |
 | B7.1 | OpenAI-Compatible LLM 实现 | [ ] | | |
 | B7.2 | Ollama LLM 实现 | [ ] | | |
 | B7.3 | OpenAI & Azure Embedding 实现 | [ ] | | |
@@ -2067,7 +2067,11 @@ dashboard:
 | 阶段 | 总任务数 | 已完成 | 进度 |
 |------|---------|--------|------|
 | 阶段 A | 3 | 3 | 100% |
+<<<<<<< HEAD
 | 阶段 B | 16 | 5 | 31% |
+=======
+| 阶段 B | 16 | 6 | 38% |
+>>>>>>> c0e5fde (B6 | Evaluator 抽象接口与工厂)
 | 阶段 C | 15 | 0 | 0% |
 | 阶段 D | 7 | 0 | 0% |
 | 阶段 E | 6 | 0 | 0% |
@@ -2075,7 +2079,11 @@ dashboard:
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
+<<<<<<< HEAD
 | **总计** | **68** | **8** | **12%** |
+=======
+| **总计** | **68** | **9** | **13%** |
+>>>>>>> c0e5fde (B6 | Evaluator 抽象接口与工厂)
 
 
 ---
@@ -2199,7 +2207,7 @@ dashboard:
 - **验收标准**：backend=none 时不会改变排序；未知 backend 明确报错。
 - **测试方法**：`pytest -q tests/unit/test_reranker_factory.py`。
 
-### B6：Evaluator 抽象接口与工厂（先做自定义轻量指标）
+### B6：Evaluator 抽象接口与工厂（先做自定义轻量指标） ✅
 - **目标**：定义 `BaseEvaluator`、`EvaluatorFactory`，实现最小 `CustomEvaluator`（例如 hit_rate/mrr）。
 - **修改文件**：
   - `src/libs/evaluator/base_evaluator.py`
