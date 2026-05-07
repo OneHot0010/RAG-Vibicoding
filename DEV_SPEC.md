@@ -1960,7 +1960,7 @@ dashboard:
 | 任务编号 | 任务名称 | 状态 | 完成日期 | 备注 |
 |---------|---------|------|---------|------|
 | B1 | LLM 抽象接口与工厂 | [x] | 2026-05-07 | BaseLLM + ChatMessage + LLMFactory 注册路由 + Fake provider 单元测试 |
-| B2 | Embedding 抽象接口与工厂 | [ ] | | |
+| B2 | Embedding 抽象接口与工厂 | [x] | 2026-05-07 | BaseEmbedding + EmbeddingFactory 注册路由 + 稳定 Fake embedding 单元测试 |
 | B3 | Splitter 抽象接口与工厂 | [ ] | | |
 | B4 | VectorStore 抽象接口与工厂 | [ ] | | |
 | B5 | Reranker 抽象接口与工厂（含 None 回退） | [ ] | | |
@@ -2067,7 +2067,7 @@ dashboard:
 | 阶段 | 总任务数 | 已完成 | 进度 |
 |------|---------|--------|------|
 | 阶段 A | 3 | 3 | 100% |
-| 阶段 B | 16 | 1 | 6% |
+| 阶段 B | 16 | 2 | 13% |
 | 阶段 C | 15 | 0 | 0% |
 | 阶段 D | 7 | 0 | 0% |
 | 阶段 E | 6 | 0 | 0% |
@@ -2075,7 +2075,7 @@ dashboard:
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **4** | **6%** |
+| **总计** | **68** | **5** | **7%** |
 
 
 ---
@@ -2151,7 +2151,7 @@ dashboard:
 - **验收标准**：在测试里用 Fake provider（测试内 stub）验证工厂路由逻辑。
 - **测试方法**：`pytest -q tests/unit/test_llm_factory.py`。
 
-### B2：Embedding 抽象接口与工厂
+### B2：Embedding 抽象接口与工厂 ✅
 - **目标**：定义 `BaseEmbedding` 与 `EmbeddingFactory`，支持批量 embed。
 - **修改文件**：
   - `src/libs/embedding/base_embedding.py`
