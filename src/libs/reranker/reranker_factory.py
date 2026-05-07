@@ -18,7 +18,7 @@ class RerankerFactoryError(ValueError):
 class RerankerFactory:
     """Registry-backed factory for reranker backends."""
 
-    _backends: ClassVar[dict[str, RerankerBuilder]] = {"none": lambda settings: NoneReranker()}
+    _backends: ClassVar[dict[str, RerankerBuilder]] = {}
 
     @classmethod
     def register(cls, backend: str, builder: RerankerBuilder) -> None:
@@ -40,7 +40,7 @@ class RerankerFactory:
     @classmethod
     def reset_defaults(cls) -> None:
         """Reset registrations to built-in defaults."""
-        cls._backends = {"none": lambda settings: NoneReranker()}
+        cls._backends = _default_backends()
 
     @classmethod
     def create(cls, settings: Settings | RerankSettings) -> BaseReranker:
@@ -70,3 +70,15 @@ class RerankerFactory:
         if not backend or not backend.strip():
             raise RerankerFactoryError("Reranker backend name is required")
         return backend.strip().lower()
+
+
+def _default_backends() -> dict[str, RerankerBuilder]:
+    from libs.reranker.cross_encoder_reranker import CrossEncoderReranker
+
+    return {
+        "none": lambda settings: NoneReranker(),
+        "cross_encoder": CrossEncoderReranker,
+    }
+
+
+RerankerFactory.reset_defaults()
