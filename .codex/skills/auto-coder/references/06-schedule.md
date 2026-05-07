@@ -84,7 +84,7 @@
 | C12 | VectorUpserter（幂等upsert） | [x] | 2026-05-07 | VectorUpserter + deterministic content ids + VectorStore upsert + idempotency/order/trace tests |
 | C13 | ImageStorage（图片存储+SQLite索引） | [x] | 2026-05-07 | ImageStorage + SQLite image_index + WAL + file persistence + collection/doc_hash listing/deletion tests |
 | C14 | Pipeline 编排（MVP 串起来） | [x] | 2026-05-07 | IngestionPipeline + integrity/load/split/transform/encode/store orchestration + skip/force/failure tests |
-| C15 | 脚本入口 ingest.py | [ ] | | |
+| C15 | 脚本入口 ingest.py | [x] | 2026-05-07 | Offline ingest CLI + path/collection/force + data-dir outputs + deterministic local embedding e2e tests |
 
 #### 阶段 D：Retrieval MVP
 
@@ -158,14 +158,14 @@
 |------|---------|--------|------|
 | 阶段 A | 3 | 3 | 100% |
 | 阶段 B | 16 | 16 | 100% |
-| 阶段 C | 15 | 14 | 93% |
+| 阶段 C | 15 | 15 | 100% |
 | 阶段 D | 7 | 0 | 0% |
 | 阶段 E | 6 | 0 | 0% |
 | 阶段 F | 5 | 0 | 0% |
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **33** | **49%** |
+| **总计** | **68** | **34** | **50%** |
 
 
 ---
@@ -742,7 +742,7 @@
   - 失败步骤抛出明确异常信息
 - **测试方法**：`pytest -v tests/integration/test_ingestion_pipeline.py`。
 
-### C15：脚本入口 ingest.py（离线可用）
+### C15：脚本入口 ingest.py（离线可用） ✅
 - **目标**：实现 `scripts/ingest.py`，支持 `--collection`、`--path`、`--force`，并调用 pipeline。
 - **修改文件**：
   - `scripts/ingest.py`
