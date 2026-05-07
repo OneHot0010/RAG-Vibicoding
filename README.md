@@ -17,6 +17,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone contains the initia
 - `B7.2` Ollama LLM: local `/api/chat` provider, factory registration, mocked HTTP tests, and readable connection errors.
 - `B7.3` OpenAI/Azure embeddings: batch embedding providers, Azure deployment URL handling, factory registration, and mocked HTTP tests.
 - `B7.4` Ollama embeddings: local `/api/embeddings` provider, batch wrapper, factory registration, and mocked HTTP/error tests.
+- `B7.5` Recursive splitter: Markdown-aware default splitter, fenced code preservation, overlap support, and factory registration.
 
 ## Quick Check
 
