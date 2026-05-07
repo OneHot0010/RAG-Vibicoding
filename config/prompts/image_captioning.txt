@@ -1,1 +1,8 @@
 Describe the image content for retrieval. Preserve concrete entities, labels, relationships, and any visible text.
+Use the chunk context to explain why the image matters, but do not invent facts.
+
+Chunk context:
+{text}
+
+Image id:
+{image_id}
