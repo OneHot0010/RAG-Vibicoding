@@ -31,6 +31,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone has completed the L
 - `C6` metadata enrichment: rule title/summary/tags, optional structured LLM metadata, fallback handling, trace hooks, and serialization tests.
 - `C7` image captioning: optional Vision LLM captions for chunk image refs, metadata writeback, disabled/error fallback, prompt templating, and trace tests.
 - `C8` dense encoding: `DenseEncoder`, embedding factory integration, `ChunkRecord` dense vectors, dimension validation, trace hooks, and mock embedding tests.
+- `C9` sparse encoding: BM25-ready term-frequency `ChunkRecord`s, document frequency stats, average doc length, token filtering, trace hooks, and edge-case tests.
 
 ## Quick Check
 

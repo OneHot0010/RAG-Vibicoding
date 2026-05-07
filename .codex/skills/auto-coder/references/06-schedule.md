@@ -78,7 +78,7 @@
 | C6 | MetadataEnricher | [x] | 2026-05-07 | MetadataEnricher + rule title/summary/tags + optional structured LLM metadata + fallback/trace tests |
 | C7 | ImageCaptioner | [x] | 2026-05-07 | ImageCaptioner + optional Vision LLM captions + metadata writeback + disabled/error fallback tests |
 | C8 | DenseEncoder | [x] | 2026-05-07 | DenseEncoder + EmbeddingFactory integration + ChunkRecord dense vectors + validation/trace tests |
-| C9 | SparseEncoder | [ ] | | |
+| C9 | SparseEncoder | [x] | 2026-05-07 | SparseEncoder + BM25-ready term frequencies + document_frequency stats + trace/edge-case tests |
 | C10 | BatchProcessor | [ ] | | |
 | C11 | BM25Indexer（倒排索引+IDF计算） | [ ] | | |
 | C12 | VectorUpserter（幂等upsert） | [ ] | | |
@@ -158,14 +158,14 @@
 |------|---------|--------|------|
 | 阶段 A | 3 | 3 | 100% |
 | 阶段 B | 16 | 16 | 100% |
-| 阶段 C | 15 | 8 | 53% |
+| 阶段 C | 15 | 9 | 60% |
 | 阶段 D | 7 | 0 | 0% |
 | 阶段 E | 6 | 0 | 0% |
 | 阶段 F | 5 | 0 | 0% |
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **27** | **40%** |
+| **总计** | **68** | **28** | **41%** |
 
 
 ---
@@ -637,7 +637,7 @@
 - **验收标准**：encoder 输出向量数量与 chunks 数量一致，维度一致。
 - **测试方法**：`pytest -q tests/unit/test_dense_encoder.py`。
 
-### C9：SparseEncoder（BM25 统计与输出契约）
+### C9：SparseEncoder（BM25 统计与输出契约） ✅
 - **目标**：实现 `sparse_encoder.py`：对 chunks 建立 BM25 所需统计（可先仅输出 term weights 结构，索引落地下一步做）。
 - **修改文件**：
   - `src/ingestion/embedding/sparse_encoder.py`
