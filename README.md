@@ -34,6 +34,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone has completed the L
 - `C9` sparse encoding: BM25-ready term-frequency `ChunkRecord`s, document frequency stats, average doc length, token filtering, trace hooks, and edge-case tests.
 - `C10` batch processing: stable chunk batching, dense/sparse encoding orchestration, flattened records, per-batch timing, trace events, and serialization tests.
 - `C11` BM25 indexing: inverted index build/add, IDF calculation, stable query ranking, JSON persistence/load, trace hooks, and roundtrip tests.
+- `C12` vector upsert: deterministic content-based vector ids, VectorStore upsert adapter, idempotent writes, batch ordering, trace hooks, and mock store tests.
 
 ## Quick Check
 

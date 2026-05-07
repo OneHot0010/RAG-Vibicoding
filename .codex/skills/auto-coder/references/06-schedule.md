@@ -81,7 +81,7 @@
 | C9 | SparseEncoder | [x] | 2026-05-07 | SparseEncoder + BM25-ready term frequencies + document_frequency stats + trace/edge-case tests |
 | C10 | BatchProcessor | [x] | 2026-05-07 | BatchProcessor + stable batching + dense/sparse orchestration + per-batch timing/trace tests |
 | C11 | BM25Indexer（倒排索引+IDF计算） | [x] | 2026-05-07 | BM25Indexer + inverted index + IDF + query ranking + JSON persistence/load tests |
-| C12 | VectorUpserter（幂等upsert） | [ ] | | |
+| C12 | VectorUpserter（幂等upsert） | [x] | 2026-05-07 | VectorUpserter + deterministic content ids + VectorStore upsert + idempotency/order/trace tests |
 | C13 | ImageStorage（图片存储+SQLite索引） | [ ] | | |
 | C14 | Pipeline 编排（MVP 串起来） | [ ] | | |
 | C15 | 脚本入口 ingest.py | [ ] | | |
@@ -158,14 +158,14 @@
 |------|---------|--------|------|
 | 阶段 A | 3 | 3 | 100% |
 | 阶段 B | 16 | 16 | 100% |
-| 阶段 C | 15 | 11 | 73% |
+| 阶段 C | 15 | 12 | 80% |
 | 阶段 D | 7 | 0 | 0% |
 | 阶段 E | 6 | 0 | 0% |
 | 阶段 F | 5 | 0 | 0% |
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **30** | **44%** |
+| **总计** | **68** | **31** | **46%** |
 
 
 ---
@@ -680,7 +680,7 @@
 - **测试方法**：`pytest -q tests/unit/test_bm25_indexer_roundtrip.py`。
 - **备注**：本任务完成Sparse路径的最后一环，为D3 (SparseRetriever) 提供可查询的BM25索引。
 
-### C12：VectorUpserter（向量存储与幂等性保证）
+### C12：VectorUpserter（向量存储与幂等性保证） ✅
 - **目标**：实现 `vector_upserter.py`：接收 DenseEncoder 的向量输出，生成稳定的 `chunk_id`，并调用 VectorStore 进行幂等写入。
 - **核心功能**：
   - 生成确定性 chunk_id：`hash(source_path + chunk_index + content_hash[:8])`
