@@ -7,6 +7,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone contains the initia
 - `A1` scaffold: source tree, configuration placeholders, prompt placeholders, data/cache/log directories, and minimal entry point.
 - `A2` testing baseline: pytest configuration, test directory conventions, smoke import tests, and a minimal sample document fixture.
 - `A3` settings loader: YAML-backed dataclass settings, fail-fast validation, stderr logger, and startup config check.
+- `B1` LLM abstraction: `BaseLLM`, normalized chat messages, registry-backed `LLMFactory`, and fake-provider routing tests.
 
 ## Quick Check
 
