@@ -23,6 +23,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone has completed the L
 - `B7.8` Cross-Encoder reranker: injectable scorer, top-M reranking, deterministic keyword fallback, factory registration, and mock scorer tests.
 - `B8` Vision LLM abstraction: `BaseVisionLLM`, normalized `ChatResponse`, independent vision provider registry, and fake-provider factory tests.
 - `B9` Azure Vision LLM: Azure multimodal chat payloads, file/bytes image encoding, deployment URLs, factory registration, and mocked HTTP tests.
+- `C1` core data contracts: `Document`, `Chunk`, `ChunkRecord`, `ImageRef`, image placeholder helpers, metadata validation, and JSON-stable serialization tests.
 
 ## Quick Check
 

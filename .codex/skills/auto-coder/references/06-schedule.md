@@ -70,7 +70,7 @@
 
 | 任务编号 | 任务名称 | 状态 | 完成日期 | 备注 |
 |---------|---------|------|---------|------|
-| C1 | 定义核心数据类型/契约（Document/Chunk/ChunkRecord） | [ ] | | |
+| C1 | 定义核心数据类型/契约（Document/Chunk/ChunkRecord） | [x] | 2026-05-07 | Document/Chunk/ChunkRecord + ImageRef + image placeholder helpers + JSON serialization tests |
 | C2 | 文件完整性检查（SHA256） | [ ] | | |
 | C3 | Loader 抽象基类与 PDF Loader | [ ] | | |
 | C4 | Splitter 集成（调用 Libs） | [ ] | | |
@@ -158,14 +158,14 @@
 |------|---------|--------|------|
 | 阶段 A | 3 | 3 | 100% |
 | 阶段 B | 16 | 16 | 100% |
-| 阶段 C | 15 | 0 | 0% |
+| 阶段 C | 15 | 1 | 7% |
 | 阶段 D | 7 | 0 | 0% |
 | 阶段 E | 6 | 0 | 0% |
 | 阶段 F | 5 | 0 | 0% |
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **19** | **28%** |
+| **总计** | **68** | **20** | **29%** |
 
 
 ---
@@ -431,7 +431,7 @@
 
 > 注：本阶段严格按 5.4.1 的离线数据流落地，并优先实现“增量跳过（SHA256）”。
 
-### C1：定义核心数据类型/契约（Document/Chunk/ChunkRecord）
+### C1：定义核心数据类型/契约（Document/Chunk/ChunkRecord） ✅
 - **目标**：定义全链路（ingestion → retrieval → mcp tools）共用的数据结构/契约，避免散落在各子模块内导致的耦合与重复。
 - **修改文件**：
   - `src/core/types.py`
