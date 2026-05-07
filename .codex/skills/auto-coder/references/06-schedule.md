@@ -53,7 +53,7 @@
 | B2 | Embedding 抽象接口与工厂 | [x] | 2026-05-07 | BaseEmbedding + EmbeddingFactory 注册路由 + 稳定 Fake embedding 单元测试 |
 | B3 | Splitter 抽象接口与工厂 | [x] | 2026-05-07 | BaseSplitter + SplitterSettings + SplitterFactory 注册路由 + Fake splitter 单元测试 |
 | B4 | VectorStore 抽象接口与工厂 | [x] | 2026-05-07 | VectorRecord/VectorQueryResult + BaseVectorStore + VectorStoreFactory + 契约测试 |
-| B5 | Reranker 抽象接口与工厂（含 None 回退） | [ ] | | |
+| B5 | Reranker 抽象接口与工厂（含 None 回退） | [x] | 2026-05-07 | RerankCandidate/RerankResult + BaseReranker + NoneReranker + RerankerFactory |
 | B6 | Evaluator 抽象接口与工厂 | [ ] | | |
 | B7.1 | OpenAI-Compatible LLM 实现 | [ ] | | |
 | B7.2 | Ollama LLM 实现 | [ ] | | |
@@ -157,7 +157,7 @@
 | 阶段 | 总任务数 | 已完成 | 进度 |
 |------|---------|--------|------|
 | 阶段 A | 3 | 3 | 100% |
-| 阶段 B | 16 | 4 | 25% |
+| 阶段 B | 16 | 5 | 31% |
 | 阶段 C | 15 | 0 | 0% |
 | 阶段 D | 7 | 0 | 0% |
 | 阶段 E | 6 | 0 | 0% |
@@ -165,7 +165,7 @@
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **7** | **10%** |
+| **总计** | **68** | **8** | **12%** |
 
 
 ---
@@ -277,7 +277,7 @@
 - **验收标准**：契约测试（contract test）约束输入输出 shape。
 - **测试方法**：`pytest -q tests/unit/test_vector_store_contract.py`。
 
-### B5：Reranker 抽象接口与工厂（含 None 回退）
+### B5：Reranker 抽象接口与工厂（含 None 回退） ✅
 - **目标**：实现 `BaseReranker`、`RerankerFactory`，提供 `NoneReranker` 作为默认回退。
 - **修改文件**：
   - `src/libs/reranker/base_reranker.py`
