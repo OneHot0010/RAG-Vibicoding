@@ -19,6 +19,10 @@ embedding:
 vision_llm:
   provider: azure
   model: gpt-4o
+splitter:
+  strategy: recursive
+  chunk_size: 1000
+  chunk_overlap: 200
 vector_store:
   backend: chroma
   persist_path: ./data/db/chroma
@@ -54,6 +58,7 @@ def test_load_default_settings_file() -> None:
     assert isinstance(settings, Settings)
     assert settings.llm.provider == "azure"
     assert settings.embedding.provider == "openai"
+    assert settings.splitter.strategy == "recursive"
     assert settings.vector_store.backend == "chroma"
     assert settings.retrieval.top_k_final == 10
     assert settings.evaluation.backends == ["custom"]

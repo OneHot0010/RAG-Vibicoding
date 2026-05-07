@@ -36,6 +36,13 @@ class VisionLLMSettings:
 
 
 @dataclass(frozen=True)
+class SplitterSettings:
+    strategy: str
+    chunk_size: int = 1000
+    chunk_overlap: int = 200
+
+
+@dataclass(frozen=True)
 class VectorStoreSettings:
     backend: str
     persist_path: str
@@ -83,6 +90,7 @@ class Settings:
     llm: LLMSettings
     embedding: EmbeddingSettings
     vision_llm: VisionLLMSettings
+    splitter: SplitterSettings
     vector_store: VectorStoreSettings
     retrieval: RetrievalSettings
     rerank: RerankSettings
@@ -115,6 +123,9 @@ def validate_settings(settings: Settings) -> None:
         "llm.model": settings.llm.model,
         "embedding.provider": settings.embedding.provider,
         "embedding.model": settings.embedding.model,
+        "splitter.strategy": settings.splitter.strategy,
+        "splitter.chunk_size": settings.splitter.chunk_size,
+        "splitter.chunk_overlap": settings.splitter.chunk_overlap,
         "vector_store.backend": settings.vector_store.backend,
         "vector_store.persist_path": settings.vector_store.persist_path,
         "retrieval.sparse_backend": settings.retrieval.sparse_backend,
@@ -160,6 +171,11 @@ def _parse_settings(data: dict[str, Any]) -> Settings:
         vision_llm=VisionLLMSettings(
             provider=_required(data, "vision_llm.provider"),
             model=_required(data, "vision_llm.model"),
+        ),
+        splitter=SplitterSettings(
+            strategy=_required(data, "splitter.strategy"),
+            chunk_size=_required_int(data, "splitter.chunk_size"),
+            chunk_overlap=_required_int(data, "splitter.chunk_overlap"),
         ),
         vector_store=VectorStoreSettings(
             backend=_required(data, "vector_store.backend"),

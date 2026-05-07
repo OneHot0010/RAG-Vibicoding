@@ -14,6 +14,7 @@ from core.settings import (
     RerankSettings,
     RetrievalSettings,
     Settings,
+    SplitterSettings,
     VectorStoreSettings,
     VisionLLMSettings,
 )
@@ -42,6 +43,7 @@ def make_settings(provider: str = "fake") -> Settings:
         llm=LLMSettings(provider="fake", model="fake-chat"),
         embedding=EmbeddingSettings(provider=provider, model="fake-embedding"),
         vision_llm=VisionLLMSettings(provider="fake", model="fake-vision"),
+        splitter=SplitterSettings(strategy="fake", chunk_size=100, chunk_overlap=10),
         vector_store=VectorStoreSettings(backend="fake", persist_path="./tmp/vector"),
         retrieval=RetrievalSettings(
             sparse_backend="bm25",

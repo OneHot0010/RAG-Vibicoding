@@ -10,6 +10,11 @@ vision_llm:
   provider: azure
   model: gpt-4o
 
+splitter:
+  strategy: recursive
+  chunk_size: 1000
+  chunk_overlap: 200
+
 vector_store:
   backend: chroma
   persist_path: ./data/db/chroma

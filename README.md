@@ -9,6 +9,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone contains the initia
 - `A3` settings loader: YAML-backed dataclass settings, fail-fast validation, stderr logger, and startup config check.
 - `B1` LLM abstraction: `BaseLLM`, normalized chat messages, registry-backed `LLMFactory`, and fake-provider routing tests.
 - `B2` Embedding abstraction: `BaseEmbedding`, registry-backed `EmbeddingFactory`, and stable fake-vector routing tests.
+- `B3` Splitter abstraction: `BaseSplitter`, splitter settings, registry-backed `SplitterFactory`, and fake-strategy routing tests.
 
 ## Quick Check
 
