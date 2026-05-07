@@ -1971,7 +1971,7 @@ dashboard:
 | B7.4 | Ollama Embedding 实现 | [x] | 2026-05-07 | OllamaEmbedding /api/embeddings + batch wrapper + mock HTTP tests |
 | B7.5 | Recursive Splitter 默认实现 | [x] | 2026-05-07 | RecursiveSplitter + Markdown/code-fence preservation + overlap + factory registration |
 | B7.6 | ChromaStore 默认实现 | [x] | 2026-05-07 | ChromaStore local persistence + cosine query + filters + roundtrip integration tests |
-| B7.7 | LLM Reranker 实现 | [ ] | | |
+| B7.7 | LLM Reranker 实现 | [x] | 2026-05-07 | LLMReranker + prompt loading + ranked_ids schema validation + mock LLM tests |
 | B7.8 | Cross-Encoder Reranker 实现 | [ ] | | |
 | B8 | Vision LLM 抽象接口与工厂集成 | [ ] | | |
 | B9 | Azure Vision LLM 实现 | [ ] | | |
@@ -2067,7 +2067,7 @@ dashboard:
 | 阶段 | 总任务数 | 已完成 | 进度 |
 |------|---------|--------|------|
 | 阶段 A | 3 | 3 | 100% |
-| 阶段 B | 16 | 12 | 75% |
+| 阶段 B | 16 | 13 | 81% |
 | 阶段 C | 15 | 0 | 0% |
 | 阶段 D | 7 | 0 | 0% |
 | 阶段 E | 6 | 0 | 0% |
@@ -2075,7 +2075,7 @@ dashboard:
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **15** | **22%** |
+| **总计** | **68** | **16** | **24%** |
 
 
 ---
@@ -2284,7 +2284,7 @@ dashboard:
   - 使用临时目录进行持久化测试，测试结束后清理。
 - **测试方法**：`pytest -q tests/integration/test_chroma_store_roundtrip.py`
 
-### B7.7：LLM Reranker（读取 rerank prompt）
+### B7.7：LLM Reranker（读取 rerank prompt） ✅
 - **目标**：补齐 `llm_reranker.py`，读取 `config/prompts/rerank.txt` 构造 prompt（测试中可注入替代文本），并可在失败时返回可回退信号。
 - **修改文件**：
   - `src/libs/reranker/llm_reranker.py`
