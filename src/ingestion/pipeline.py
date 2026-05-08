@@ -5,7 +5,7 @@ from __future__ import annotations
 import copy
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from core.settings import Settings
 from core.trace.trace_context import TraceContext
@@ -91,15 +91,33 @@ class IngestionPipeline:
         collection: str = "default",
         force: bool = False,
         trace: TraceContext | None = None,
+        on_progress: Callable[[str, int, int], None] | None = None,
     ) -> IngestionPipelineResult:
         """Run ingestion for one source file."""
         trace = trace or TraceContext(trace_type="ingestion")
         source_path = Path(path)
-        _record_trace(trace, "pipeline.start", {"source_path": str(source_path), "collection": collection, "force": force})
+        total_progress_steps = 13
+        progress_current = 0
 
-        file_hash = self._stage("integrity.compute_sha256", lambda: self.integrity_checker.compute_sha256(source_path), trace)
-        if not force and self._stage("integrity.should_skip", lambda: self.integrity_checker.should_skip(file_hash), trace):
+        def progress(stage_name: str, complete: bool = False) -> None:
+            nonlocal progress_current
+            if on_progress is None:
+                return
+            progress_current = total_progress_steps if complete else min(progress_current + 1, total_progress_steps)
+            on_progress(stage_name, progress_current, total_progress_steps)
+
+        def stage(name: str, action: Any) -> Any:
+            result = self._stage(name, action, trace)
+            progress(name)
+            return result
+
+        _record_trace(trace, "pipeline.start", {"source_path": str(source_path), "collection": collection, "force": force})
+        progress("pipeline.start")
+
+        file_hash = stage("integrity.compute_sha256", lambda: self.integrity_checker.compute_sha256(source_path))
+        if not force and stage("integrity.should_skip", lambda: self.integrity_checker.should_skip(file_hash)):
             _record_trace(trace, "pipeline.skipped", {"file_hash": file_hash})
+            progress("pipeline.skipped", complete=True)
             return IngestionPipelineResult(
                 file_hash=file_hash,
                 source_path=str(source_path),
@@ -115,25 +133,23 @@ class IngestionPipeline:
             )
 
         try:
-            document = self._stage("loader.load", lambda: self.loader.load(source_path), trace)
+            document = stage("loader.load", lambda: self.loader.load(source_path))
             document = _with_collection(document, collection)
-            chunks = self._stage("chunker.split_document", lambda: self.chunker.split_document(document, trace=trace), trace)
-            chunks = self._stage("transforms.apply", lambda: self._apply_transforms(chunks, trace), trace)
-            batch_result = self._stage("batch_processor.process", lambda: self.batch_processor.process(chunks, trace=trace), trace)
+            chunks = stage("chunker.split_document", lambda: self.chunker.split_document(document, trace=trace))
+            chunks = stage("transforms.apply", lambda: self._apply_transforms(chunks, trace))
+            batch_result = stage("batch_processor.process", lambda: self.batch_processor.process(chunks, trace=trace))
             sparse_result = _combine_sparse_results(batch_result)
-            self._stage("bm25_indexer.build", lambda: self.bm25_indexer.build(sparse_result, trace=trace), trace)
-            self._stage("bm25_indexer.save", self.bm25_indexer.save, trace)
-            vector_records = self._stage(
+            stage("bm25_indexer.build", lambda: self.bm25_indexer.build(sparse_result, trace=trace))
+            stage("bm25_indexer.save", self.bm25_indexer.save)
+            vector_records = stage(
                 "vector_upserter.upsert",
                 lambda: self.vector_upserter.upsert(batch_result.dense_records, trace=trace),
-                trace,
             )
-            image_records = self._stage(
+            image_records = stage(
                 "image_storage.index",
                 lambda: self._store_images(document, collection, file_hash, trace),
-                trace,
             )
-            self._stage(
+            stage(
                 "integrity.mark_success",
                 lambda: self.integrity_checker.mark_success(
                     file_hash,
@@ -141,13 +157,13 @@ class IngestionPipeline:
                     file_size=source_path.stat().st_size,
                     chunk_count=len(chunks),
                 ),
-                trace,
             )
             _record_trace(
                 trace,
                 "pipeline.completed",
                 {"file_hash": file_hash, "chunk_count": len(chunks), "image_count": len(image_records)},
             )
+            progress("pipeline.completed", complete=True)
             return IngestionPipelineResult(
                 file_hash=file_hash,
                 source_path=str(source_path),
@@ -162,6 +178,7 @@ class IngestionPipeline:
                 trace=trace,
             )
         except Exception as exc:
+            progress("pipeline.failed", complete=True)
             try:
                 self.integrity_checker.mark_failed(file_hash, str(exc), file_path=source_path)
             except Exception:

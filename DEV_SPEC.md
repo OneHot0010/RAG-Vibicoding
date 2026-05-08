@@ -2027,7 +2027,7 @@ dashboard:
 | F2 | 结构化日志 logger（JSON Lines） | [x] | 2026-05-08 | JSONFormatter + get_trace_logger/write_trace + JSONL persistence + duplicate-handler guard + TraceCollector sink tests |
 | F3 | 在 Query 链路打点 | [x] | 2026-05-08 | CLI/MCP query trace_type=query + query lifecycle stages + JSONL persistence + MCP structured trace metadata |
 | F4 | 在 Ingestion 链路打点 | [x] | 2026-05-08 | Ingest CLI trace_type=ingestion per file + pipeline lifecycle stages + JSONL persistence + e2e tests |
-| F5 | Pipeline 进度回调 (on_progress) | [ ] | | |
+| F5 | Pipeline 进度回调 (on_progress) | [x] | 2026-05-08 | IngestionPipeline on_progress callback + success/skip/failure completion events + progress tests |
 
 #### 阶段 G：可视化管理平台 Dashboard
 
@@ -2071,11 +2071,11 @@ dashboard:
 | 阶段 C | 15 | 15 | 100% |
 | 阶段 D | 7 | 7 | 100% |
 | 阶段 E | 6 | 6 | 100% |
-| 阶段 F | 5 | 4 | 80% |
+| 阶段 F | 5 | 5 | 100% |
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **51** | **75%** |
+| **总计** | **68** | **52** | **76%** |
 
 
 ---
@@ -2976,7 +2976,7 @@ dashboard:
   - `trace.to_dict()` 中 `trace_type == "ingestion"`
 - **测试方法**：`pytest -q tests/e2e/test_data_ingestion.py tests/integration/test_ingestion_pipeline.py`。
 
-### F5：Pipeline 进度回调 (on_progress)
+### F5：Pipeline 进度回调 (on_progress) ✅
 - **目标**：在 `IngestionPipeline.run()` 方法中新增可选 `on_progress` 回调参数，支持外部实时获取处理进度。
 - **前置依赖**：F4（Ingestion 打点）
 - **修改文件**：
@@ -2986,6 +2986,13 @@ dashboard:
   - 回调签名：`on_progress(stage_name: str, current: int, total: int)`
   - `on_progress` 为 `None` 时完全不影响现有行为
   - 各阶段在处理每个 batch 或完成时触发回调
+- **完成内容**：
+  - `IngestionPipeline.run()` 新增可选 `on_progress` 参数。
+  - 成功路径按 pipeline 阶段依次回调，包含 integrity/load/split/transform/process/index/upsert/completed。
+  - 跳过路径触发 `pipeline.skipped`，并将进度推到 `total`。
+  - 失败路径触发 `pipeline.failed`，并将进度推到 `total`。
+  - `on_progress=None` 时旧行为保持不变。
+  - 新增单测覆盖成功、跳过、失败和可选回调场景。
 - **验收标准**：Pipeline 运行时传入 mock 回调，断言各阶段均被调用且参数正确。
 - **测试方法**：`pytest -q tests/unit/test_pipeline_progress.py`。
 
