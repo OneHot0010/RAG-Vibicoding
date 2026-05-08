@@ -45,6 +45,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone has completed the L
 - `D5` hybrid search: QueryProcessor/Dense/Sparse/RRF orchestration, metadata filter fallback, single-route degradation, trace events, and integration tests.
 - `D6` core reranker: RetrievalResult-to-reranker adapter, backend rerank integration, fusion-order fallback metadata, trace hooks, and fallback tests.
 - `D7` query CLI: `scripts/query.py` with query/top-k/collection/verbose/no-rerank options, offline embeddings, formatted results, no-data messaging, and e2e tests.
+- `E1` MCP stdio server: line-delimited JSON-RPC entry point, initialize response, stderr-only logging, clean stdout transport, and subprocess integration tests.
 
 ## Quick Check
 
