@@ -113,7 +113,7 @@
 
 | 任务编号 | 任务名称 | 状态 | 完成日期 | 备注 |
 |---------|---------|------|---------|------|
-| F1 | TraceContext 增强（finish + 耗时统计 + trace_type） | [ ] | | |
+| F1 | TraceContext 增强（finish + 耗时统计 + trace_type） | [x] | 2026-05-08 | TraceContext trace_type/finish/elapsed_ms/to_dict + compatibility-preserving stages + TraceCollector tests |
 | F2 | 结构化日志 logger（JSON Lines） | [ ] | | |
 | F3 | 在 Query 链路打点 | [ ] | | |
 | F4 | 在 Ingestion 链路打点 | [ ] | | |
@@ -161,11 +161,11 @@
 | 阶段 C | 15 | 15 | 100% |
 | 阶段 D | 7 | 7 | 100% |
 | 阶段 E | 6 | 6 | 100% |
-| 阶段 F | 5 | 0 | 0% |
+| 阶段 F | 5 | 1 | 20% |
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **47** | **69%** |
+| **总计** | **68** | **48** | **71%** |
 
 
 ---
@@ -973,7 +973,7 @@
 
 ## 阶段 F：Trace 基础设施与打点（目标：Ingestion + Query 双链路可追踪）
 
-### F1：TraceContext 增强（finish + 耗时统计 + trace_type）
+### F1：TraceContext 增强（finish + 耗时统计 + trace_type） ✅
 - **目标**：增强已有的 `TraceContext`（C5 已实现基础版），添加 `finish()` 方法、耗时统计、`trace_type` 字段（区分 query/ingestion）、`to_dict()` 序列化功能。
 - **修改文件**：
   - `src/core/trace/trace_context.py`（增强：添加 trace_type/finish/elapsed_ms/to_dict）
@@ -989,6 +989,13 @@
   - `record_stage` 追加阶段数据（已有）
   - `finish()` 后 `to_dict()` 输出包含 `trace_id`、`trace_type`、`started_at`、`finished_at`、`total_elapsed_ms`、`stages`
   - 输出 dict 可直接 `json.dumps()` 序列化
+- **完成内容**：
+  - `TraceContext(trace_type="query"|"ingestion")` 增加类型校验，默认 query。
+  - `record_stage()` 保持原有 `{"name", "data"}` 兼容结构，同时内部记录 stage 时间戳与耗时。
+  - `finish()` 幂等标记完成时间并计算总耗时。
+  - `elapsed_ms()` 支持查询总耗时或指定阶段耗时。
+  - `to_dict()` 输出 JSON-safe payload，包含 trace/stage 时间字段和 `elapsed_ms`。
+  - `TraceCollector.collect()` 自动 finish、收集 payload，并可转发给 sink。
 - **测试方法**：`pytest -q tests/unit/test_trace_context.py`。
 
 
