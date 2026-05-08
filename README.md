@@ -54,6 +54,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone has completed the L
 - `F1` trace context enhancement: query/ingestion trace types, finish/elapsed timing, JSON-safe serialization, compatibility-preserving stage records, and TraceCollector tests.
 - `F2` JSON Lines trace logger: JSONFormatter, trace file handler, write_trace persistence, duplicate-handler protection, and TraceCollector sink integration tests.
 - `F3` query trace integration: CLI/MCP query entrypoints create query traces, record query lifecycle stages, persist JSONL traces, and expose MCP structured trace metadata.
+- `F4` ingestion trace integration: ingest CLI creates ingestion traces per file, records pipeline lifecycle stages, persists JSONL traces, and keeps pipeline default traces typed as ingestion.
 
 ## Quick Check
 

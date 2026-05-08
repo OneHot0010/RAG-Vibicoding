@@ -2026,7 +2026,7 @@ dashboard:
 | F1 | TraceContext 增强（finish + 耗时统计 + trace_type） | [x] | 2026-05-08 | TraceContext trace_type/finish/elapsed_ms/to_dict + compatibility-preserving stages + TraceCollector tests |
 | F2 | 结构化日志 logger（JSON Lines） | [x] | 2026-05-08 | JSONFormatter + get_trace_logger/write_trace + JSONL persistence + duplicate-handler guard + TraceCollector sink tests |
 | F3 | 在 Query 链路打点 | [x] | 2026-05-08 | CLI/MCP query trace_type=query + query lifecycle stages + JSONL persistence + MCP structured trace metadata |
-| F4 | 在 Ingestion 链路打点 | [ ] | | |
+| F4 | 在 Ingestion 链路打点 | [x] | 2026-05-08 | Ingest CLI trace_type=ingestion per file + pipeline lifecycle stages + JSONL persistence + e2e tests |
 | F5 | Pipeline 进度回调 (on_progress) | [ ] | | |
 
 #### 阶段 G：可视化管理平台 Dashboard
@@ -2071,11 +2071,11 @@ dashboard:
 | 阶段 C | 15 | 15 | 100% |
 | 阶段 D | 7 | 7 | 100% |
 | 阶段 E | 6 | 6 | 100% |
-| 阶段 F | 5 | 3 | 60% |
+| 阶段 F | 5 | 4 | 80% |
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **50** | **74%** |
+| **总计** | **68** | **51** | **75%** |
 
 
 ---
@@ -2953,17 +2953,28 @@ dashboard:
   - `trace.to_dict()` 中 `trace_type == "query"`
 - **测试方法**：`pytest -q tests/e2e/test_query_cli.py tests/integration/test_mcp_server.py tests/integration/test_hybrid_search.py`。
 
-### F4：在 Ingestion 链路打点
+### F4：在 Ingestion 链路打点 ✅
 - **目标**：在 IngestionPipeline 中注入 TraceContext（`trace_type="ingestion"`），记录各摄取阶段的处理数据。
 - **前置依赖**：C5（Pipeline）、F1（TraceContext 增强）、F2（结构化日志）
 - **修改文件**：
   - `src/ingestion/pipeline.py`（增加 trace 传递：load/split/transform/embed/upsert 阶段）
+  - `scripts/ingest.py`（CLI 摄取入口创建 ingestion trace 并持久化 JSONL）
   - `tests/integration/test_ingestion_pipeline.py`（断言 trace 中存在各阶段）
+  - `tests/e2e/test_data_ingestion.py`（断言 CLI trace JSONL）
+- **完成内容**：
+  - `IngestionPipeline.run()` 默认创建 `TraceContext(trace_type="ingestion")`。
+  - `scripts/ingest.py` 为每个输入文件创建一条 ingestion trace。
+  - 摄取开始记录 `ingestion.start`，包含 source_path/collection/force/entrypoint。
+  - Pipeline 已有 integrity/load/split/transform/embed/BM25/upsert/image/index 等阶段记录进入同一条 trace。
+  - 摄取结束记录 `ingestion.completed`，包含 skipped/chunk_count/image_count。
+  - 摄取异常记录 `ingestion.failed`，并在抛出前持久化 trace。
+  - 通过 `TraceCollector + write_trace()` 将 ingestion trace 持久化为 JSON Lines。
+  - CLI 支持 `--trace-log-file` 覆盖日志路径，便于测试和调试。
 - **验收标准**：
   - 一次摄取生成 trace，包含 `load`/`split`/`transform`/`embed`/`upsert` 阶段
   - 每个阶段记录 `elapsed_ms`、`method`（如 markitdown/recursive/chroma）和处理详情
   - `trace.to_dict()` 中 `trace_type == "ingestion"`
-- **测试方法**：`pytest -q tests/integration/test_ingestion_pipeline.py`。
+- **测试方法**：`pytest -q tests/e2e/test_data_ingestion.py tests/integration/test_ingestion_pipeline.py`。
 
 ### F5：Pipeline 进度回调 (on_progress)
 - **目标**：在 `IngestionPipeline.run()` 方法中新增可选 `on_progress` 回调参数，支持外部实时获取处理进度。

@@ -32,7 +32,13 @@ def write_minimal_pdf(path: Path, text: str) -> None:
     )
 
 
-def run_ingest(repo_root: Path, pdf_path: Path, data_dir: Path, force: bool = False) -> subprocess.CompletedProcess[str]:
+def run_ingest(
+    repo_root: Path,
+    pdf_path: Path,
+    data_dir: Path,
+    force: bool = False,
+    trace_log_file: Path | None = None,
+) -> subprocess.CompletedProcess[str]:
     command = [
         sys.executable,
         "scripts/ingest.py",
@@ -45,6 +51,8 @@ def run_ingest(repo_root: Path, pdf_path: Path, data_dir: Path, force: bool = Fa
     ]
     if force:
         command.append("--force")
+    if trace_log_file is not None:
+        command.extend(["--trace-log-file", str(trace_log_file)])
     return subprocess.run(command, cwd=repo_root, text=True, capture_output=True, check=False)
 
 
@@ -84,3 +92,37 @@ def test_ingest_cli_force_reruns_processed_file(tmp_path: Path) -> None:
     payload = json.loads(forced.stdout)
     assert payload["ingested"] == 1
     assert payload["skipped"] == 0
+
+
+def test_ingest_cli_writes_ingestion_trace_jsonl(tmp_path: Path) -> None:
+    repo_root = Path(__file__).resolve().parents[2]
+    pdf_path = tmp_path / "trace.pdf"
+    data_dir = tmp_path / "data"
+    trace_log = tmp_path / "logs" / "traces.jsonl"
+    write_minimal_pdf(pdf_path, "Trace ingestion records pipeline stages")
+
+    completed = run_ingest(repo_root, pdf_path, data_dir, trace_log_file=trace_log)
+
+    assert completed.returncode == 0, completed.stderr
+    rows = [json.loads(line) for line in trace_log.read_text(encoding="utf-8").splitlines()]
+    assert len(rows) == 1
+    assert rows[0]["trace_type"] == "ingestion"
+    assert rows[0]["finished_at"] is not None
+    stage_names = [stage["name"] for stage in rows[0]["stages"]]
+    assert "ingestion.start" in stage_names
+    assert "pipeline.start" in stage_names
+    assert "pipeline.completed" in stage_names
+    assert "ingestion.completed" in stage_names
+
+
+def test_ingest_cli_rejects_invalid_input_before_trace_creation(tmp_path: Path) -> None:
+    repo_root = Path(__file__).resolve().parents[2]
+    bad_path = tmp_path / "not_pdf.txt"
+    data_dir = tmp_path / "data"
+    trace_log = tmp_path / "logs" / "traces.jsonl"
+    bad_path.write_text("not a pdf", encoding="utf-8")
+
+    completed = run_ingest(repo_root, bad_path, data_dir, trace_log_file=trace_log)
+
+    assert completed.returncode == 1
+    assert not trace_log.exists()

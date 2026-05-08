@@ -169,6 +169,8 @@ def test_pipeline_skips_successful_file_without_force(tmp_path: Path) -> None:
     assert first.skipped is False
     assert second.skipped is True
     assert loader.calls == 1
+    assert first.trace.trace_type == "ingestion"
+    assert second.trace.trace_type == "ingestion"
 
 
 def test_pipeline_force_reruns_successful_file(tmp_path: Path) -> None:

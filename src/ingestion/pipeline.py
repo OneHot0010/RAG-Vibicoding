@@ -93,7 +93,7 @@ class IngestionPipeline:
         trace: TraceContext | None = None,
     ) -> IngestionPipelineResult:
         """Run ingestion for one source file."""
-        trace = trace or TraceContext()
+        trace = trace or TraceContext(trace_type="ingestion")
         source_path = Path(path)
         _record_trace(trace, "pipeline.start", {"source_path": str(source_path), "collection": collection, "force": force})
 

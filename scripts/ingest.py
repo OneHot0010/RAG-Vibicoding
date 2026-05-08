@@ -16,12 +16,14 @@ if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
 from core.settings import Settings, load_settings
+from core.trace import TraceCollector, TraceContext
 from ingestion import IngestionPipeline, IngestionPipelineError
 from ingestion.chunking import DocumentChunker
 from ingestion.embedding import BatchProcessor, DenseEncoder, SparseEncoder
 from ingestion.storage import BM25Indexer, ImageStorage, VectorUpserter
 from libs.embedding import BaseEmbedding
 from libs.loader import PdfLoader, SQLiteIntegrityChecker
+from observability.logger import write_trace
 
 
 class LocalHashEmbedding(BaseEmbedding):
@@ -45,10 +47,39 @@ def main(argv: list[str] | None = None) -> int:
         settings = load_settings(args.config)
         paths = _resolve_paths(args.path)
         pipeline = build_pipeline(settings, args.data_dir, offline_embedding=not args.online_embedding)
-        results = [
-            pipeline.run(path, collection=args.collection, force=args.force).to_dict()
-            for path in paths
-        ]
+        results = []
+        for path in paths:
+            trace = TraceContext(trace_type="ingestion")
+            trace.record_stage(
+                "ingestion.start",
+                {
+                    "source_path": str(path),
+                    "collection": args.collection,
+                    "force": args.force,
+                    "entrypoint": "cli",
+                },
+            )
+            try:
+                result = pipeline.run(path, collection=args.collection, force=args.force, trace=trace)
+                trace.record_stage(
+                    "ingestion.completed",
+                    {
+                        "source_path": str(path),
+                        "collection": args.collection,
+                        "skipped": result.skipped,
+                        "chunk_count": len(result.chunks),
+                        "image_count": len(result.image_records),
+                    },
+                )
+                results.append(result.to_dict())
+            except Exception as exc:
+                trace.record_stage(
+                    "ingestion.failed",
+                    {"source_path": str(path), "collection": args.collection, "error": str(exc)},
+                )
+                _persist_ingestion_trace(settings, trace, args.trace_log_file)
+                raise
+            _persist_ingestion_trace(settings, trace, args.trace_log_file)
     except (IngestionPipelineError, ValueError, OSError) as exc:
         print(f"ingest failed: {exc}", file=sys.stderr)
         return 1
@@ -77,6 +108,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--force", action="store_true", help="Re-ingest files even if their hash was already processed.")
     parser.add_argument("--config", default="config/settings.yaml", help="Settings YAML path.")
     parser.add_argument("--data-dir", default="data", help="Root directory for generated local indexes.")
+    parser.add_argument("--trace-log-file", help="Override the JSON Lines trace log path.")
     parser.add_argument(
         "--online-embedding",
         action="store_true",
@@ -122,6 +154,14 @@ def _resolve_paths(raw_path: str) -> list[Path]:
 
 def _with_vector_store_path(settings: Settings, persist_path: Path) -> Settings:
     return replace(settings, vector_store=replace(settings.vector_store, persist_path=str(persist_path)))
+
+
+def _persist_ingestion_trace(settings: Settings, trace: TraceContext, override_log_file: str | None = None) -> None:
+    if not settings.observability.enabled and override_log_file is None:
+        trace.finish()
+        return
+    log_file = override_log_file or settings.observability.log_file
+    TraceCollector(sink=lambda payload: write_trace(payload, log_file=log_file)).collect(trace)
 
 
 if __name__ == "__main__":
