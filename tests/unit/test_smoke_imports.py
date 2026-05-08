@@ -28,6 +28,7 @@ REPRESENTATIVE_MODULES = (
     "observability.dashboard.pages.ingestion_manager",
     "observability.dashboard.pages.ingestion_traces",
     "observability.dashboard.pages.overview",
+    "observability.dashboard.pages.query_traces",
     "observability.dashboard.services.config_service",
     "observability.dashboard.services.data_service",
     "observability.dashboard.services.ingestion_service",

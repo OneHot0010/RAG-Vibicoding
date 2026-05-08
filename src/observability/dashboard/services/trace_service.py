@@ -20,6 +20,7 @@ class TraceSummary:
     status: str
     source_path: str | None = None
     collection: str | None = None
+    query: str | None = None
     stage_count: int = 0
 
     def to_dict(self) -> dict[str, Any]:
@@ -33,6 +34,7 @@ class TraceSummary:
             "status": self.status,
             "source_path": self.source_path,
             "collection": self.collection,
+            "query": self.query,
             "stage_count": self.stage_count,
         }
 
@@ -64,6 +66,7 @@ class TraceService:
     def summarize_trace(self, trace: dict[str, Any]) -> TraceSummary:
         """Build a compact summary for one trace."""
         source_path, collection = _trace_context_fields(trace)
+        query = _trace_query(trace)
         return TraceSummary(
             trace_id=str(trace.get("trace_id") or ""),
             trace_type=str(trace.get("trace_type") or ""),
@@ -73,6 +76,7 @@ class TraceService:
             status=_trace_status(trace),
             source_path=source_path,
             collection=collection,
+            query=query,
             stage_count=len(_stages(trace)),
         )
 
@@ -98,6 +102,10 @@ class TraceService:
         """Return ingestion trace summaries."""
         return self.list_summaries(trace_type="ingestion")
 
+    def query_summaries(self) -> list[dict[str, Any]]:
+        """Return query trace summaries."""
+        return self.list_summaries(trace_type="query")
+
     def _read_traces(self) -> list[dict[str, Any]]:
         if not self.trace_log_file.is_file():
             return []
@@ -121,6 +129,9 @@ def _trace_context_fields(trace: dict[str, Any]) -> tuple[str | None, str | None
         data = stage.get("data") if isinstance(stage.get("data"), dict) else {}
         source_path = source_path or _optional_str(data.get("source_path"))
         collection = collection or _optional_str(data.get("collection"))
+        filters = data.get("filters")
+        if collection is None and isinstance(filters, dict):
+            collection = _optional_str(filters.get("collection"))
         if source_path and collection:
             break
     return source_path, collection
@@ -135,6 +146,18 @@ def _trace_status(trace: dict[str, Any]) -> str:
     if trace.get("finished_at") or any("completed" in name for name in stage_names):
         return "success"
     return "running"
+
+
+def _trace_query(trace: dict[str, Any]) -> str | None:
+    query = _optional_str(trace.get("query") or trace.get("user_query"))
+    if query:
+        return query
+    for stage in _stages(trace):
+        data = stage.get("data") if isinstance(stage.get("data"), dict) else {}
+        query = _optional_str(data.get("query") or data.get("user_query") or data.get("original_query"))
+        if query:
+            return query
+    return None
 
 
 def _stages(trace: dict[str, Any]) -> list[dict[str, Any]]:

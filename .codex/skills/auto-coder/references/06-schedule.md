@@ -128,7 +128,7 @@
 | G3 | 数据浏览器页面 | [x] | 2026-05-08 | Streamlit data browser page + collection/search filters + document detail + chunk metadata/image preview rows + unit tests |
 | G4 | Ingestion 管理页面 | [x] | 2026-05-08 | Dashboard upload ingestion + progress callback UI + offline pipeline service + document deletion controls + unit tests |
 | G5 | Ingestion 追踪页面 | [x] | 2026-05-08 | TraceService JSONL reader + ingestion history summaries + stage timing waterfall rows + trace detail expansion + unit tests |
-| G6 | Query 追踪页面 | [ ] | | |
+| G6 | Query 追踪页面 | [x] | 2026-05-08 | Query trace history search + stage timing waterfall + Dense/Sparse/Fusion/Rerank result shaping + rank-delta view + unit tests |
 
 #### 阶段 H：评估体系
 
@@ -162,10 +162,10 @@
 | 阶段 D | 7 | 7 | 100% |
 | 阶段 E | 6 | 6 | 100% |
 | 阶段 F | 5 | 5 | 100% |
-| 阶段 G | 6 | 5 | 83% |
+| 阶段 G | 6 | 6 | 100% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **57** | **84%** |
+| **总计** | **68** | **58** | **85%** |
 
 
 ---
@@ -1202,16 +1202,27 @@
 - **验收标准**：执行 ingest 后，Dashboard 显示对应的追踪记录与耗时瀑布图。
 - **测试方法**：`pytest -q tests/unit/test_dashboard_ingestion_traces.py tests/unit/test_dashboard_ingestion_manager.py tests/unit/test_dashboard_overview.py tests/unit/test_smoke_imports.py`。
 
-### G6：Query 追踪页面
+### G6：Query 追踪页面 ✅
 - **目标**：实现 Dashboard Query 追踪页面（查询历史、Dense/Sparse 对比、Rerank 变化）。
 - **前置依赖**：F3（Query 打点）、G1（Dashboard 架构）、G5（TraceService 已实现）
 - **修改文件**：
-  - `src/observability/dashboard/pages/query_traces.py`（新增）
+  - `src/observability/dashboard/pages/query_traces.py`（实现）
+  - `src/observability/dashboard/services/trace_service.py`（补充 query 摘要与 filters.collection 提取）
+  - `src/observability/dashboard/app.py`（Query Traces 导航接入真实页面）
+  - `tests/unit/test_dashboard_query_traces.py`（新增）
+  - `tests/unit/test_smoke_imports.py`（补充页面导入）
 - **实现要点**：
   - 历史列表：按时间倒序展示 `trace_type == "query"` 记录，支持按 Query 关键词搜索
   - 详情页：耗时瀑布图 + Dense vs Sparse 并列对比 + Rerank 前后排名变化
+- **完成内容**：
+  - 新增 `query_traces_model()`，生成查询历史、搜索过滤、选中 trace、阶段耗时瀑布、查询统计。
+  - Query Traces 页面支持历史表、trace 选择、状态/耗时/结果数/是否 rerank 指标、阶段详情展开。
+  - 支持从 trace stage data 中提取 Dense/Sparse/Fusion/Rerank 候选列表；若当前 trace 只记录计数，也能展示阶段耗时与统计。
+  - Rerank 视图根据 fusion 排名计算 `previous_rank` 与 `rank_delta`，展示重排前后变化。
+  - Dashboard `page_registry()` 的 Query Traces 已从占位页切换为 `query_traces.render()`。
+  - 补充单测覆盖 query 摘要、collection 提取、搜索过滤、Dense/Sparse/Fusion/Rerank 行、rank delta 和页面模型。
 - **验收标准**：执行 query 后，Dashboard 显示查询追踪详情与各阶段对比。
-- **测试方法**：手动验证（先 query → 打开 Dashboard → 查看追踪）。
+- **测试方法**：`pytest -q tests/unit/test_dashboard_query_traces.py tests/unit/test_dashboard_ingestion_traces.py tests/unit/test_dashboard_overview.py tests/unit/test_smoke_imports.py`。
 
 ---
 
