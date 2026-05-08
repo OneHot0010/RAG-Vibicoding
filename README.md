@@ -38,6 +38,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone has completed the L
 - `C13` image storage: SQLite image index, WAL mode, image file persistence, collection/doc_hash listing, deletion, trace hooks, and concurrency tests.
 - `C14` ingestion pipeline: integrity/load/split/transform/encode/store orchestration, skip/force handling, BM25/Chroma/ImageStorage outputs, and failure-state tests.
 - `C15` offline ingestion CLI: `scripts/ingest.py` with `--path`, `--collection`, `--force`, local deterministic embeddings, data-dir routing, JSON summaries, and e2e tests.
+- `D1` query processing: `ProcessedQuery`, keyword extraction, inline/explicit metadata filters, value coercion, trace hooks, and preprocessing tests.
 
 ## Quick Check
 

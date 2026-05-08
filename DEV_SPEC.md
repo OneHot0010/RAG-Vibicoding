@@ -2000,7 +2000,7 @@ dashboard:
 
 | 任务编号 | 任务名称 | 状态 | 完成日期 | 备注 |
 |---------|---------|------|---------|------|
-| D1 | QueryProcessor（关键词提取 + filters） | [ ] | | |
+| D1 | QueryProcessor（关键词提取 + filters） | [x] | 2026-05-08 | ProcessedQuery + keyword extraction + inline/explicit filters + value coercion + trace tests |
 | D2 | DenseRetriever（调用 VectorStore.query） | [ ] | | |
 | D3 | SparseRetriever（BM25 查询） | [ ] | | |
 | D4 | RRF Fusion | [ ] | | |
@@ -2069,13 +2069,13 @@ dashboard:
 | 阶段 A | 3 | 3 | 100% |
 | 阶段 B | 16 | 16 | 100% |
 | 阶段 C | 15 | 15 | 100% |
-| 阶段 D | 7 | 0 | 0% |
+| 阶段 D | 7 | 1 | 14% |
 | 阶段 E | 6 | 0 | 0% |
 | 阶段 F | 5 | 0 | 0% |
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **34** | **50%** |
+| **总计** | **68** | **35** | **51%** |
 
 
 ---
@@ -2664,7 +2664,7 @@ dashboard:
 
 ## 阶段 D：Retrieval MVP（目标：能 query 并返回 Top-K chunks）
 
-### D1：QueryProcessor（关键词提取 + filters 结构）
+### D1：QueryProcessor（关键词提取 + filters 结构） ✅
 - **目标**：实现 `query_processor.py`：关键词提取（先规则/分词），并解析通用 filters 结构（可空实现）。
 - **修改文件**：
   - `src/core/query_engine/query_processor.py`
