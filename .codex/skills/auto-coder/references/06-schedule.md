@@ -92,7 +92,7 @@
 |---------|---------|------|---------|------|
 | D1 | QueryProcessor（关键词提取 + filters） | [x] | 2026-05-08 | ProcessedQuery + keyword extraction + inline/explicit filters + value coercion + trace tests |
 | D2 | DenseRetriever（调用 VectorStore.query） | [x] | 2026-05-08 | RetrievalResult + DenseRetriever + embedding/vector-store orchestration + filters/trace/error tests |
-| D3 | SparseRetriever（BM25 查询） | [ ] | | |
+| D3 | SparseRetriever（BM25 查询） | [x] | 2026-05-08 | BaseVectorStore.get_by_ids + Chroma hydration + SparseRetriever BM25 merge + original_chunk_id mapping tests |
 | D4 | RRF Fusion | [ ] | | |
 | D5 | HybridSearch 编排 | [ ] | | |
 | D6 | Reranker（Core 层编排 + Fallback） | [ ] | | |
@@ -159,13 +159,13 @@
 | 阶段 A | 3 | 3 | 100% |
 | 阶段 B | 16 | 16 | 100% |
 | 阶段 C | 15 | 15 | 100% |
-| 阶段 D | 7 | 2 | 29% |
+| 阶段 D | 7 | 3 | 43% |
 | 阶段 E | 6 | 0 | 0% |
 | 阶段 F | 5 | 0 | 0% |
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **36** | **53%** |
+| **总计** | **68** | **37** | **54%** |
 
 
 ---
@@ -785,7 +785,7 @@
   - mock EmbeddingClient 和 VectorStore 时能正确编排调用
 - **测试方法**：`pytest -q tests/unit/test_dense_retriever.py`（mock embedding + vector store）。
 
-### D3：SparseRetriever（BM25 查询）
+### D3：SparseRetriever（BM25 查询） ✅
 - **目标**：实现 `sparse_retriever.py`：从 `data/db/bm25/` 载入索引并查询。
 - **前置任务**：需在 `BaseVectorStore` 和 `ChromaStore` 中添加 `get_by_ids()` 方法，用于根据 chunk_id 批量获取 text 和 metadata
 - **修改文件**：

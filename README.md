@@ -40,6 +40,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone has completed the L
 - `C15` offline ingestion CLI: `scripts/ingest.py` with `--path`, `--collection`, `--force`, local deterministic embeddings, data-dir routing, JSON summaries, and e2e tests.
 - `D1` query processing: `ProcessedQuery`, keyword extraction, inline/explicit metadata filters, value coercion, trace hooks, and preprocessing tests.
 - `D2` dense retrieval: `RetrievalResult`, query embedding orchestration, VectorStore querying, metadata filters, trace hooks, and mock retriever tests.
+- `D3` sparse retrieval: VectorStore `get_by_ids`, Chroma record hydration, BM25 keyword retrieval, original chunk id mapping, trace hooks, and sparse retriever tests.
 
 ## Quick Check
 

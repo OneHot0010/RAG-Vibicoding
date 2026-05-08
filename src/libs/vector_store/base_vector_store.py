@@ -43,3 +43,7 @@ class BaseVectorStore(ABC):
         trace: Any | None = None,
     ) -> list[VectorQueryResult]:
         """Return the top matching records for a query vector."""
+
+    @abstractmethod
+    def get_by_ids(self, ids: list[str], trace: Any | None = None) -> list[VectorRecord]:
+        """Return stored records matching ids, preserving requested id order where possible."""

@@ -59,6 +59,9 @@ class FakeVectorStore(BaseVectorStore):
             )
         return sorted(scored, key=lambda result: result.score, reverse=True)[:top_k]
 
+    def get_by_ids(self, ids: list[str], trace: Any | None = None) -> list[VectorRecord]:
+        return [self.records[record_id] for record_id in ids if record_id in self.records]
+
 
 class NotAVectorStore:
     pass
@@ -130,6 +133,18 @@ def test_upsert_is_idempotent_by_record_id() -> None:
 
     assert len(store.records) == 1
     assert results[0].text == "new"
+
+
+def test_get_by_ids_preserves_requested_order_and_omits_missing() -> None:
+    store = FakeVectorStore(VectorStoreSettings(backend="fake", persist_path="./tmp/vector"))
+    store.upsert(
+        [
+            VectorRecord(id="a", vector=[1.0], text="alpha"),
+            VectorRecord(id="b", vector=[1.0], text="beta"),
+        ]
+    )
+
+    assert [record.id for record in store.get_by_ids(["b", "missing", "a"])] == ["b", "a"]
 
 
 def test_factory_routes_using_full_settings() -> None:

@@ -66,6 +66,9 @@ class FakeVectorStore(BaseVectorStore):
         self.calls.append((vector, top_k, filters or {}, trace))
         return self.hits[:top_k]
 
+    def get_by_ids(self, ids: list[str], trace: Any | None = None) -> list[VectorRecord]:
+        return []
+
 
 class FactoryVectorStore(FakeVectorStore):
     def __init__(self, settings: VectorStoreSettings) -> None:

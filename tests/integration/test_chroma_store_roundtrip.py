@@ -93,6 +93,40 @@ def test_records_persist_across_store_instances(tmp_path) -> None:
     assert raw[0]["id"] == "a"
 
 
+def test_get_by_ids_preserves_order_and_returns_full_records(tmp_path) -> None:
+    store = ChromaStore(VectorStoreSettings(backend="chroma", persist_path=str(tmp_path / "chroma")))
+    store.upsert(
+        [
+            VectorRecord(id="a", vector=[1.0], text="alpha", metadata={"source": "a.md"}),
+            VectorRecord(id="b", vector=[2.0], text="beta", metadata={"source": "b.md"}),
+        ]
+    )
+
+    records = store.get_by_ids(["b", "missing", "a"])
+
+    assert [record.id for record in records] == ["b", "a"]
+    assert records[0].text == "beta"
+    assert records[0].metadata == {"source": "b.md"}
+
+
+def test_get_by_ids_can_match_original_chunk_id_metadata(tmp_path) -> None:
+    store = ChromaStore(VectorStoreSettings(backend="chroma", persist_path=str(tmp_path / "chroma")))
+    store.upsert(
+        [
+            VectorRecord(
+                id="stable-vector-id",
+                vector=[1.0],
+                text="alpha",
+                metadata={"source": "a.md", "original_chunk_id": "chunk-a"},
+            )
+        ]
+    )
+
+    records = store.get_by_ids(["chunk-a"])
+
+    assert [record.id for record in records] == ["stable-vector-id"]
+
+
 def test_query_dimension_mismatch_has_clear_error(tmp_path) -> None:
     store = ChromaStore(VectorStoreSettings(backend="chroma", persist_path=str(tmp_path / "chroma")))
     store.upsert([VectorRecord(id="a", vector=[1.0, 0.0], text="alpha")])

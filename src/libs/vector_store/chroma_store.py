@@ -69,6 +69,26 @@ class ChromaStore(BaseVectorStore):
 
         return sorted(results, key=lambda result: (-result.score, result.id))[:top_k]
 
+    def get_by_ids(self, ids: list[str], trace: Any | None = None) -> list[VectorRecord]:
+        """Return records by id in caller-provided order, omitting missing ids.
+
+        The ingestion vector upserter stores deterministic vector ids while
+        preserving source chunk ids in metadata.original_chunk_id, so this
+        method accepts either identifier.
+        """
+        if not isinstance(ids, list) or not all(isinstance(item, str) and item for item in ids):
+            raise ChromaStoreError("ids must be a list of non-empty strings")
+        original_id_lookup = {
+            str(record.metadata["original_chunk_id"]): record
+            for record in self._records.values()
+            if record.metadata.get("original_chunk_id")
+        }
+        return [
+            self._records[record_id] if record_id in self._records else original_id_lookup[record_id]
+            for record_id in ids
+            if record_id in self._records or record_id in original_id_lookup
+        ]
+
     def _load_records(self) -> dict[str, VectorRecord]:
         if not self.records_path.exists():
             return {}

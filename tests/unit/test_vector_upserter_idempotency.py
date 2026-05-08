@@ -43,6 +43,9 @@ class FakeVectorStore(BaseVectorStore):
     ) -> list[VectorQueryResult]:
         return []
 
+    def get_by_ids(self, ids: list[str], trace: Any | None = None) -> list[VectorRecord]:
+        return [self.records[record_id] for record_id in ids if record_id in self.records]
+
 
 class FactoryVectorStore(FakeVectorStore):
     def __init__(self, settings: VectorStoreSettings) -> None:
