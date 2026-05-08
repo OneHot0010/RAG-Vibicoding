@@ -2047,7 +2047,7 @@ dashboard:
 | H1 | RagasEvaluator 实现 | [x] | 2026-05-08 | RagasEvaluator lazy optional adapter + metrics normalization + factory registration + trace hooks + mock-runner tests |
 | H2 | CompositeEvaluator 实现 | [x] | 2026-05-08 | CompositeEvaluator multi-backend orchestration + metric/detail merge + duplicate namespacing + factory auto-composition + tests |
 | H3 | EvalRunner + Golden Test Set | [x] | 2026-05-08 | EvalRunner + golden test set loader + EvalReport aggregation + scripts/evaluate.py + fixture + unit tests |
-| H4 | 评估面板页面 | [ ] | | |
+| H4 | 评估面板页面 | [x] | 2026-05-08 | Dashboard evaluation panel + EvaluationService + backend/test-set controls + metrics/case tables + unit tests |
 | H5 | Recall 回归测试（E2E） | [ ] | | |
 
 #### 阶段 I：端到端验收与文档收口
@@ -2073,9 +2073,9 @@ dashboard:
 | 阶段 E | 6 | 6 | 100% |
 | 阶段 F | 5 | 5 | 100% |
 | 阶段 G | 6 | 6 | 100% |
-| 阶段 H | 5 | 3 | 60% |
+| 阶段 H | 5 | 4 | 80% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **61** | **90%** |
+| **总计** | **68** | **62** | **91%** |
 
 
 ---
@@ -3219,17 +3219,27 @@ dashboard:
 - **验收标准**：`python scripts/evaluate.py` 可运行，输出 metrics。
 - **测试方法**：`pytest -q tests/unit/test_eval_runner.py tests/unit/test_evaluate_script.py tests/unit/test_composite_evaluator.py tests/unit/test_custom_evaluator.py tests/unit/test_smoke_imports.py`。
 
-### H4：评估面板页面
+### H4：评估面板页面 ✅
 - **目标**：实现 Dashboard 评估面板页面（运行评估、查看指标、历史对比）。
 - **前置依赖**：H3（EvalRunner）、G1（Dashboard 架构）
 - **修改文件**：
   - `src/observability/dashboard/pages/evaluation_panel.py`（实现：替换占位提示）
+  - `src/observability/dashboard/services/evaluation_service.py`（新增：Dashboard 评估服务）
+  - `src/observability/dashboard/app.py`（Evaluation 导航接入真实页面）
+  - `tests/unit/test_dashboard_evaluation_panel.py`（新增）
+  - `tests/unit/test_smoke_imports.py`（补充页面与服务导入）
 - **实现要点**：
   - 选择评估后端与 golden test set
   - 点击运行，展示评估结果（hit_rate、mrr、各 query 明细）
   - 可选：历史评估结果对比图
+- **完成内容**：
+  - 新增 `EvaluationService`，封装 settings 加载、后端列表、golden test set summary、EvalRunner 执行。
+  - `evaluation_panel_model()` 返回 backends、test set 摘要、report、metrics rows、case rows，便于单测。
+  - Streamlit 页面支持 golden test set 输入、backend 选择、top_k、online embedding 开关、运行评估。
+  - 页面展示指标卡/table、case 明细表、单 case retrieved/golden/details 展开。
+  - Dashboard `page_registry()` 的 Evaluation 已从占位页切换为 `evaluation_panel.render()`。
 - **验收标准**：可在 Dashboard 中运行评估并查看指标。
-- **测试方法**：手动验证。
+- **测试方法**：`pytest -q tests/unit/test_dashboard_evaluation_panel.py tests/unit/test_eval_runner.py tests/unit/test_dashboard_overview.py tests/unit/test_smoke_imports.py`。
 
 ### H5：Recall 回归测试（E2E）
 - **目标**：实现 `tests/e2e/test_recall.py`：基于 golden set 做最小召回阈值（例如 hit@k）。

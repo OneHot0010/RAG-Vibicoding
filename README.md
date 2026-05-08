@@ -65,6 +65,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone has completed the L
 - `H1` Ragas evaluator: lazy optional Ragas adapter, faithfulness/answer relevancy/context precision metrics, factory registration, trace hooks, and mock-runner tests.
 - `H2` composite evaluator: multi-backend evaluator orchestration, metric/detail merging, duplicate metric namespacing, factory auto-composition, and tests.
 - `H3` eval runner: golden test set loader, retrieval/evaluator runner, aggregate EvalReport, `scripts/evaluate.py`, fixture, and CLI tests.
+- `H4` evaluation panel: Dashboard backend/test-set controls, EvalRunner service wrapper, metrics table/cards, case details, and page tests.
 
 ## Quick Check
 

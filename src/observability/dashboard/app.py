@@ -11,7 +11,14 @@ if __package__ in {None, ""}:
     if str(src_root) not in sys.path:
         sys.path.insert(0, str(src_root))
 
-from observability.dashboard.pages import data_browser, ingestion_manager, ingestion_traces, overview, query_traces
+from observability.dashboard.pages import (
+    data_browser,
+    evaluation_panel,
+    ingestion_manager,
+    ingestion_traces,
+    overview,
+    query_traces,
+)
 
 
 PageRenderer = Callable[[Any], None]
@@ -25,7 +32,7 @@ def page_registry() -> dict[str, PageRenderer]:
         "Ingestion Manager": lambda st: ingestion_manager.render(st),
         "Ingestion Traces": lambda st: ingestion_traces.render(st),
         "Query Traces": lambda st: query_traces.render(st),
-        "Evaluation": lambda st: _placeholder(st, "Evaluation"),
+        "Evaluation": lambda st: evaluation_panel.render(st),
     }
 
 
