@@ -2046,7 +2046,7 @@ dashboard:
 |---------|---------|------|---------|------|
 | H1 | RagasEvaluator 实现 | [x] | 2026-05-08 | RagasEvaluator lazy optional adapter + metrics normalization + factory registration + trace hooks + mock-runner tests |
 | H2 | CompositeEvaluator 实现 | [x] | 2026-05-08 | CompositeEvaluator multi-backend orchestration + metric/detail merge + duplicate namespacing + factory auto-composition + tests |
-| H3 | EvalRunner + Golden Test Set | [ ] | | |
+| H3 | EvalRunner + Golden Test Set | [x] | 2026-05-08 | EvalRunner + golden test set loader + EvalReport aggregation + scripts/evaluate.py + fixture + unit tests |
 | H4 | 评估面板页面 | [ ] | | |
 | H5 | Recall 回归测试（E2E） | [ ] | | |
 
@@ -2073,9 +2073,9 @@ dashboard:
 | 阶段 E | 6 | 6 | 100% |
 | 阶段 F | 5 | 5 | 100% |
 | 阶段 G | 6 | 6 | 100% |
-| 阶段 H | 5 | 2 | 40% |
+| 阶段 H | 5 | 3 | 60% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **60** | **88%** |
+| **总计** | **68** | **61** | **90%** |
 
 
 ---
@@ -3182,13 +3182,17 @@ dashboard:
 - **验收标准**：配置两个 evaluator 时，返回的 metrics 包含两者的指标。
 - **测试方法**：`pytest -q tests/unit/test_composite_evaluator.py tests/unit/test_custom_evaluator.py tests/unit/test_ragas_evaluator.py tests/unit/test_smoke_imports.py`。
 
-### H3：EvalRunner + Golden Test Set
+### H3：EvalRunner + Golden Test Set ✅
 - **目标**：实现 `eval_runner.py`：读取 `tests/fixtures/golden_test_set.json`，跑 retrieval 并产出 metrics。
 - **前置依赖**：D5（HybridSearch）、H1-H2（评估器）
 - **修改文件**：
-  - `src/observability/evaluation/eval_runner.py`（新增）
+  - `src/observability/evaluation/eval_runner.py`（实现）
+  - `src/observability/evaluation/__init__.py`（导出 EvalRunner/Report）
   - `tests/fixtures/golden_test_set.json`（新增：黄金测试集）
-  - `scripts/evaluate.py`（新增：评估运行脚本）
+  - `scripts/evaluate.py`（实现：评估运行脚本）
+  - `tests/unit/test_eval_runner.py`（新增）
+  - `tests/unit/test_evaluate_script.py`（新增）
+  - `tests/unit/test_smoke_imports.py`（补充导入）
 - **实现类/函数**：
   - `EvalRunner.__init__(settings, hybrid_search, evaluator)`
   - `EvalRunner.run(test_set_path) -> EvalReport`：运行评估并返回报告
@@ -3205,8 +3209,15 @@ dashboard:
     ]
   }
   ```
+- **完成内容**：
+  - 新增 `GoldenTestCase`、`EvalCaseResult`、`EvalReport`、`EvalRunner` 与 `load_golden_test_set()`。
+  - Golden set 支持 `expected_chunk_ids`、`expected_sources`、`filters`、`top_k`、`contexts`、`expected_answer`。
+  - Runner 调用 `hybrid_search.search()` 获取检索结果，将 chunk id 与 source path/name 一起纳入匹配 ID。
+  - Runner 调用 evaluator/CompositeEvaluator，聚合每个 case 的 metrics，并输出平均指标与 case 明细。
+  - `scripts/evaluate.py` 支持 `--config`、`--data-dir`、`--test-set`、`--backend`、`--top-k`、`--online-embedding`，输出 JSON 报告。
+  - 新增 `tests/fixtures/golden_test_set.json` 作为默认黄金测试集样例。
 - **验收标准**：`python scripts/evaluate.py` 可运行，输出 metrics。
-- **测试方法**：`pytest -q tests/integration/test_hybrid_search.py` 或 `python scripts/evaluate.py`。
+- **测试方法**：`pytest -q tests/unit/test_eval_runner.py tests/unit/test_evaluate_script.py tests/unit/test_composite_evaluator.py tests/unit/test_custom_evaluator.py tests/unit/test_smoke_imports.py`。
 
 ### H4：评估面板页面
 - **目标**：实现 Dashboard 评估面板页面（运行评估、查看指标、历史对比）。

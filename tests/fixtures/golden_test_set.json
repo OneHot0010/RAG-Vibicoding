@@ -1,0 +1,30 @@
+{
+  "test_cases": [
+    {
+      "query": "How do I configure Azure OpenAI?",
+      "expected_chunk_ids": ["chunk-azure-config"],
+      "expected_sources": ["docs/config_guide.pdf"],
+      "expected_answer": "Configure the Azure OpenAI endpoint, deployment, and API key in settings.",
+      "contexts": [
+        "Azure OpenAI configuration uses endpoint, deployment, model, and API key settings."
+      ],
+      "filters": {
+        "collection": "docs"
+      },
+      "top_k": 3
+    },
+    {
+      "query": "How does hybrid retrieval combine dense and sparse results?",
+      "expected_chunk_ids": ["chunk-hybrid-rrf"],
+      "expected_sources": ["docs/retrieval_guide.pdf"],
+      "expected_answer": "Hybrid retrieval fuses dense and sparse routes with RRF before optional reranking.",
+      "contexts": [
+        "Hybrid retrieval uses dense retrieval, sparse BM25 retrieval, and reciprocal rank fusion."
+      ],
+      "filters": {
+        "collection": "docs"
+      },
+      "top_k": 3
+    }
+  ]
+}

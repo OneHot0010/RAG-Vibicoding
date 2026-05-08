@@ -64,6 +64,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone has completed the L
 - `G6` query traces: query history search, timing waterfall rows, Dense/Sparse route tables, fusion rows, rerank rank-delta view, and page tests.
 - `H1` Ragas evaluator: lazy optional Ragas adapter, faithfulness/answer relevancy/context precision metrics, factory registration, trace hooks, and mock-runner tests.
 - `H2` composite evaluator: multi-backend evaluator orchestration, metric/detail merging, duplicate metric namespacing, factory auto-composition, and tests.
+- `H3` eval runner: golden test set loader, retrieval/evaluator runner, aggregate EvalReport, `scripts/evaluate.py`, fixture, and CLI tests.
 
 ## Quick Check
 

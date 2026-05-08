@@ -25,6 +25,7 @@ REPRESENTATIVE_MODULES = (
     "libs.evaluator.ragas_evaluator",
     "observability.logger",
     "observability.evaluation.composite_evaluator",
+    "observability.evaluation.eval_runner",
     "observability.dashboard.app",
     "observability.dashboard.pages.data_browser",
     "observability.dashboard.pages.ingestion_manager",
