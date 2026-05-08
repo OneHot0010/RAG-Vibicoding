@@ -2004,7 +2004,7 @@ dashboard:
 | D2 | DenseRetriever（调用 VectorStore.query） | [x] | 2026-05-08 | RetrievalResult + DenseRetriever + embedding/vector-store orchestration + filters/trace/error tests |
 | D3 | SparseRetriever（BM25 查询） | [x] | 2026-05-08 | BaseVectorStore.get_by_ids + Chroma hydration + SparseRetriever BM25 merge + original_chunk_id mapping tests |
 | D4 | RRF Fusion | [x] | 2026-05-08 | RRFusion + configurable k + deterministic tie-breaks + contribution metadata + trace tests |
-| D5 | HybridSearch 编排 | [ ] | | |
+| D5 | HybridSearch 编排 | [x] | 2026-05-08 | HybridSearch orchestration + metadata filter fallback + dense/sparse degradation + trace integration tests |
 | D6 | Reranker（Core 层编排 + Fallback） | [ ] | | |
 | D7 | 脚本入口 query.py（查询可用） | [ ] | | |
 
@@ -2069,13 +2069,13 @@ dashboard:
 | 阶段 A | 3 | 3 | 100% |
 | 阶段 B | 16 | 16 | 100% |
 | 阶段 C | 15 | 15 | 100% |
-| 阶段 D | 7 | 4 | 57% |
+| 阶段 D | 7 | 5 | 71% |
 | 阶段 E | 6 | 0 | 0% |
 | 阶段 F | 5 | 0 | 0% |
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **38** | **56%** |
+| **总计** | **68** | **39** | **57%** |
 
 
 ---
@@ -2727,7 +2727,7 @@ dashboard:
 - **验收标准**：对构造的排名输入输出 deterministic；k 参数可配置。
 - **测试方法**：`pytest -q tests/unit/test_fusion_rrf.py`。
 
-### D5：HybridSearch 编排
+### D5：HybridSearch 编排 ✅
 - **目标**：实现 `hybrid_search.py`：编排 Dense + Sparse + Fusion 的完整混合检索流程，并集成 Metadata 过滤逻辑。
 - **前置依赖**：D1（QueryProcessor）、D2（DenseRetriever）、D3（SparseRetriever）、D4（Fusion）
 - **修改文件**：
