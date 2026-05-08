@@ -2048,7 +2048,7 @@ dashboard:
 | H2 | CompositeEvaluator 实现 | [x] | 2026-05-08 | CompositeEvaluator multi-backend orchestration + metric/detail merge + duplicate namespacing + factory auto-composition + tests |
 | H3 | EvalRunner + Golden Test Set | [x] | 2026-05-08 | EvalRunner + golden test set loader + EvalReport aggregation + scripts/evaluate.py + fixture + unit tests |
 | H4 | 评估面板页面 | [x] | 2026-05-08 | Dashboard evaluation panel + EvaluationService + backend/test-set controls + metrics/case tables + unit tests |
-| H5 | Recall 回归测试（E2E） | [ ] | | |
+| H5 | Recall 回归测试（E2E） | [x] | 2026-05-08 | E2E generated-PDF ingest + evaluate.py custom backend + fixed hit_rate threshold + golden source assertions |
 
 #### 阶段 I：端到端验收与文档收口
 
@@ -2073,9 +2073,9 @@ dashboard:
 | 阶段 E | 6 | 6 | 100% |
 | 阶段 F | 5 | 5 | 100% |
 | 阶段 G | 6 | 6 | 100% |
-| 阶段 H | 5 | 4 | 80% |
+| 阶段 H | 5 | 5 | 100% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **62** | **91%** |
+| **总计** | **68** | **63** | **93%** |
 
 
 ---
@@ -3241,12 +3241,18 @@ dashboard:
 - **验收标准**：可在 Dashboard 中运行评估并查看指标。
 - **测试方法**：`pytest -q tests/unit/test_dashboard_evaluation_panel.py tests/unit/test_eval_runner.py tests/unit/test_dashboard_overview.py tests/unit/test_smoke_imports.py`。
 
-### H5：Recall 回归测试（E2E）
+### H5：Recall 回归测试（E2E） ✅
 - **目标**：实现 `tests/e2e/test_recall.py`：基于 golden set 做最小召回阈值（例如 hit@k）。
 - **前置依赖**：H3（EvalRunner + golden_test_set）
 - **修改文件**：
   - `tests/e2e/test_recall.py`（新增）
   - `tests/fixtures/golden_test_set.json`（补齐若干条）
+- **完成内容**：
+  - 新增 E2E recall 回归测试，临时生成两份主题明确的 PDF。
+  - 调用真实 `scripts/ingest.py` 将 PDF 摄取到临时 data_dir。
+  - 生成测试专用 golden set，使用 `expected_sources` 校验召回命中文档。
+  - 调用真实 `scripts/evaluate.py --backend custom` 运行 EvalRunner。
+  - 固定 `MIN_HIT_RATE = 1.0` 阈值，并断言每个 case 的 hit_rate 均为 1.0。
 - **验收标准**：hit@k 达到阈值（阈值写死在测试里，便于回归）。
 - **测试方法**：`pytest -q tests/e2e/test_recall.py`。
 
