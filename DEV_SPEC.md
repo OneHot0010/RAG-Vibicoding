@@ -2036,7 +2036,7 @@ dashboard:
 | G1 | Dashboard 基础架构与系统总览页 | [x] | 2026-05-08 | Streamlit app shell + six-page navigation + overview config cards/data stats + start script + unit tests |
 | G2 | DocumentManager 实现 | [x] | 2026-05-08 | DocumentManager list/detail/delete/stats + cross-store JSON/SQLite coordination + DataService wrappers + unit tests |
 | G3 | 数据浏览器页面 | [x] | 2026-05-08 | Streamlit data browser page + collection/search filters + document detail + chunk metadata/image preview rows + unit tests |
-| G4 | Ingestion 管理页面 | [ ] | | |
+| G4 | Ingestion 管理页面 | [x] | 2026-05-08 | Dashboard upload ingestion + progress callback UI + offline pipeline service + document deletion controls + unit tests |
 | G5 | Ingestion 追踪页面 | [ ] | | |
 | G6 | Query 追踪页面 | [ ] | | |
 
@@ -2072,10 +2072,10 @@ dashboard:
 | 阶段 D | 7 | 7 | 100% |
 | 阶段 E | 6 | 6 | 100% |
 | 阶段 F | 5 | 5 | 100% |
-| 阶段 G | 6 | 3 | 50% |
+| 阶段 G | 6 | 4 | 67% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **55** | **81%** |
+| **总计** | **68** | **56** | **82%** |
 
 
 ---
@@ -3068,17 +3068,27 @@ dashboard:
 - **验收标准**：可在 Dashboard 中浏览已摄入的文档和 chunk 详情。
 - **测试方法**：`pytest -q tests/unit/test_dashboard_data_browser.py tests/unit/test_dashboard_overview.py tests/unit/test_smoke_imports.py`。
 
-### G4：Ingestion 管理页面
+### G4：Ingestion 管理页面 ✅
 - **目标**：实现 Dashboard Ingestion 管理页面（文件上传触发摄取、进度展示、文档删除）。
 - **前置依赖**：G2（DocumentManager）、G3（DataService）、F5（on_progress 回调）
 - **修改文件**：
-  - `src/observability/dashboard/pages/ingestion_manager.py`（新增）
+  - `src/observability/dashboard/pages/ingestion_manager.py`（实现）
+  - `src/observability/dashboard/services/ingestion_service.py`（新增：上传保存、Pipeline 构建、进度记录、删除封装）
+  - `src/observability/dashboard/app.py`（Ingestion Manager 导航接入真实页面）
+  - `tests/unit/test_dashboard_ingestion_manager.py`（新增）
+  - `tests/unit/test_smoke_imports.py`（补充页面与服务导入）
 - **实现要点**：
   - 文件上传：`st.file_uploader` 选择文件 + 集合选择
   - 摄取触发：调用 `IngestionPipeline.run(on_progress=...)` + `st.progress()` 实时进度
   - 文档删除：在文档列表中提供删除按钮，调用 `DocumentManager.delete_document()`
+- **完成内容**：
+  - 新增 `IngestionService`，支持 PDF 上传保存、离线 hash embedding Pipeline 构建、Dashboard trace 记录、progress callback 转发。
+  - 新增 `ingestion_manager_model()`，返回文档列表、集合列表和页面表格行，便于单测。
+  - Streamlit 页面支持上传 PDF、输入 collection、force re-ingest、运行摄取并用 `st.progress()` 展示阶段进度。
+  - 页面文档列表提供删除选择，调用 `DataService.delete_document()`/`DocumentManager.delete_document()` 完成跨存储删除。
+  - Dashboard `page_registry()` 的 Ingestion Manager 已从占位页切换为 `ingestion_manager.render()`。
 - **验收标准**：可在 Dashboard 中上传文件触发摄取、看到实时进度条、删除已有文档。
-- **测试方法**：手动验证（上传 PDF → 观察进度 → 删除 → 确认已移除）。
+- **测试方法**：`pytest -q tests/unit/test_dashboard_ingestion_manager.py tests/unit/test_dashboard_data_browser.py tests/unit/test_dashboard_overview.py tests/unit/test_smoke_imports.py`。
 
 ### G5：Ingestion 追踪页面
 - **目标**：实现 Dashboard Ingestion 追踪页面（摄取历史列表、阶段耗时瀑布图）。
