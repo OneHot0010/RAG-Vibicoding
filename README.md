@@ -46,6 +46,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone has completed the L
 - `D6` core reranker: RetrievalResult-to-reranker adapter, backend rerank integration, fusion-order fallback metadata, trace hooks, and fallback tests.
 - `D7` query CLI: `scripts/query.py` with query/top-k/collection/verbose/no-rerank options, offline embeddings, formatted results, no-data messaging, and e2e tests.
 - `E1` MCP stdio server: line-delimited JSON-RPC entry point, initialize response, stderr-only logging, clean stdout transport, and subprocess integration tests.
+- `E2` protocol handler: JSON-RPC request validation, initialize/tools/list/tools/call routing, tool schemas, standard error codes, and handler tests.
 
 ## Quick Check
 

@@ -6,13 +6,19 @@ import json
 import sys
 from typing import TextIO
 
-from mcp_server.protocol_handler import handle_jsonrpc_message
+from mcp_server.protocol_handler import ProtocolHandler, default_protocol_handler
 from observability.logger import get_logger
 
 
-def serve(stdin: TextIO = sys.stdin, stdout: TextIO = sys.stdout, stderr: TextIO = sys.stderr) -> int:
+def serve(
+    stdin: TextIO = sys.stdin,
+    stdout: TextIO = sys.stdout,
+    stderr: TextIO = sys.stderr,
+    handler: ProtocolHandler | None = None,
+) -> int:
     """Run a line-delimited JSON-RPC stdio server."""
     logger = get_logger("mcp_server")
+    handler = handler or default_protocol_handler()
     logger.info("MCP stdio server starting")
     for raw_line in stdin:
         line = raw_line.strip()
@@ -23,7 +29,7 @@ def serve(stdin: TextIO = sys.stdin, stdout: TextIO = sys.stdout, stderr: TextIO
             if not isinstance(message, dict):
                 response = _error_response(None, -32600, "Invalid Request")
             else:
-                response = handle_jsonrpc_message(message)
+                response = handler.handle_message(message)
         except json.JSONDecodeError:
             response = _error_response(None, -32700, "Parse error")
         except Exception as exc:
