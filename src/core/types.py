@@ -167,6 +167,43 @@ class ChunkRecord:
         )
 
 
+@dataclass(frozen=True)
+class RetrievalResult:
+    """Normalized retrieval hit returned by query engine components."""
+
+    chunk_id: str
+    score: float
+    text: str
+    metadata: dict[str, Any]
+
+    def __post_init__(self) -> None:
+        _require_non_empty("RetrievalResult.chunk_id", self.chunk_id)
+        _require_text("RetrievalResult.text", self.text)
+        if isinstance(self.score, bool) or not isinstance(self.score, (int, float)):
+            raise CoreTypeError("RetrievalResult.score must be numeric")
+        if not isinstance(self.metadata, Mapping):
+            raise CoreTypeError("RetrievalResult.metadata must be a mapping")
+
+    def to_dict(self) -> dict[str, Any]:
+        """Serialize this retrieval hit into JSON-friendly primitives."""
+        return {
+            "chunk_id": self.chunk_id,
+            "score": float(self.score),
+            "text": self.text,
+            "metadata": _serialize_metadata(self.metadata),
+        }
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> "RetrievalResult":
+        """Create a retrieval hit from a serialized mapping."""
+        return cls(
+            chunk_id=str(data.get("chunk_id") or ""),
+            score=float(data.get("score", 0.0)),
+            text=str(data.get("text") or ""),
+            metadata=dict(data.get("metadata") or {}),
+        )
+
+
 def image_placeholder(image_id: str) -> str:
     """Return the canonical image placeholder for document text."""
     _require_non_empty("image_id", image_id)

@@ -91,7 +91,7 @@
 | 任务编号 | 任务名称 | 状态 | 完成日期 | 备注 |
 |---------|---------|------|---------|------|
 | D1 | QueryProcessor（关键词提取 + filters） | [x] | 2026-05-08 | ProcessedQuery + keyword extraction + inline/explicit filters + value coercion + trace tests |
-| D2 | DenseRetriever（调用 VectorStore.query） | [ ] | | |
+| D2 | DenseRetriever（调用 VectorStore.query） | [x] | 2026-05-08 | RetrievalResult + DenseRetriever + embedding/vector-store orchestration + filters/trace/error tests |
 | D3 | SparseRetriever（BM25 查询） | [ ] | | |
 | D4 | RRF Fusion | [ ] | | |
 | D5 | HybridSearch 编排 | [ ] | | |
@@ -159,13 +159,13 @@
 | 阶段 A | 3 | 3 | 100% |
 | 阶段 B | 16 | 16 | 100% |
 | 阶段 C | 15 | 15 | 100% |
-| 阶段 D | 7 | 1 | 14% |
+| 阶段 D | 7 | 2 | 29% |
 | 阶段 E | 6 | 0 | 0% |
 | 阶段 F | 5 | 0 | 0% |
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **35** | **51%** |
+| **总计** | **68** | **36** | **53%** |
 
 
 ---
@@ -762,7 +762,7 @@
 - **验收标准**：对输入 query 输出 `keywords` 非空（可根据停用词策略），filters 为 dict。
 - **测试方法**：`pytest -q tests/unit/test_query_processor.py`。
 
-### D2：DenseRetriever（调用 VectorStore.query）
+### D2：DenseRetriever（调用 VectorStore.query） ✅
 - **目标**：实现 `dense_retriever.py`，组合 `EmbeddingClient`（query 向量化）+ `VectorStore`（向量检索），完成语义召回。
 - **前置任务**：
   1. 需先在 `src/core/types.py` 中定义 `RetrievalResult` 类型（包含 `chunk_id`, `score`, `text`, `metadata` 字段）

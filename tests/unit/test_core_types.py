@@ -12,6 +12,7 @@ from core.types import (
     CoreTypeError,
     Document,
     ImageRef,
+    RetrievalResult,
     extract_image_placeholders,
     image_placeholder,
     normalize_image_refs,
@@ -85,6 +86,25 @@ def test_chunk_record_serializes_optional_vectors() -> None:
     assert serialized["dense_vector"] == [0.1, 0.2]
     assert serialized["sparse_vector"] == {"rag": 1.5}
     assert ChunkRecord.from_dict(serialized) == record
+
+
+def test_retrieval_result_serializes_stable_shape() -> None:
+    result = RetrievalResult(
+        chunk_id="chunk-1",
+        score=0.75,
+        text="retrieved text",
+        metadata={"source_path": "sample.md", "collection": "docs"},
+    )
+
+    serialized = result.to_dict()
+
+    assert serialized == {
+        "chunk_id": "chunk-1",
+        "score": 0.75,
+        "text": "retrieved text",
+        "metadata": {"source_path": "sample.md", "collection": "docs"},
+    }
+    assert RetrievalResult.from_dict(serialized) == result
 
 
 def test_metadata_requires_source_path() -> None:
