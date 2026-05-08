@@ -52,6 +52,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone has completed the L
 - `E5` get document summary tool: MCP tool registration, Chroma metadata lookup by doc id/source name/hash, title/summary/tag aggregation, ingestion timestamp lookup, and stdio integration tests.
 - `E6` multimodal response assembly: image ref resolution from chunk metadata/ImageStorage, base64 MCP ImageContent, mime type detection, skipped-image metadata, and ResponseBuilder integration tests.
 - `F1` trace context enhancement: query/ingestion trace types, finish/elapsed timing, JSON-safe serialization, compatibility-preserving stage records, and TraceCollector tests.
+- `F2` JSON Lines trace logger: JSONFormatter, trace file handler, write_trace persistence, duplicate-handler protection, and TraceCollector sink integration tests.
 
 ## Quick Check
 

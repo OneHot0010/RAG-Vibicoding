@@ -2024,7 +2024,7 @@ dashboard:
 | 任务编号 | 任务名称 | 状态 | 完成日期 | 备注 |
 |---------|---------|------|---------|------|
 | F1 | TraceContext 增强（finish + 耗时统计 + trace_type） | [x] | 2026-05-08 | TraceContext trace_type/finish/elapsed_ms/to_dict + compatibility-preserving stages + TraceCollector tests |
-| F2 | 结构化日志 logger（JSON Lines） | [ ] | | |
+| F2 | 结构化日志 logger（JSON Lines） | [x] | 2026-05-08 | JSONFormatter + get_trace_logger/write_trace + JSONL persistence + duplicate-handler guard + TraceCollector sink tests |
 | F3 | 在 Query 链路打点 | [ ] | | |
 | F4 | 在 Ingestion 链路打点 | [ ] | | |
 | F5 | Pipeline 进度回调 (on_progress) | [ ] | | |
@@ -2071,11 +2071,11 @@ dashboard:
 | 阶段 C | 15 | 15 | 100% |
 | 阶段 D | 7 | 7 | 100% |
 | 阶段 E | 6 | 6 | 100% |
-| 阶段 F | 5 | 1 | 20% |
+| 阶段 F | 5 | 2 | 40% |
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **48** | **71%** |
+| **总计** | **68** | **49** | **72%** |
 
 
 ---
@@ -2909,7 +2909,7 @@ dashboard:
 - **测试方法**：`pytest -q tests/unit/test_trace_context.py`。
 
 
-### F2：结构化日志 logger（JSON Lines）
+### F2：结构化日志 logger（JSON Lines） ✅
 - **目标**：增强 `observability/logger.py`，支持 JSON Lines 格式输出，并实现 trace 持久化到 `logs/traces.jsonl`。
 - **修改文件**：
   - `src/observability/logger.py`（增强：添加 JSONFormatter + FileHandler）
@@ -2921,6 +2921,12 @@ dashboard:
 - **与 F1 的分工**：
   - F1 负责 TraceContext 的数据结构（含 `trace_type`）和 `finish()` 方法
   - F2 负责将 `trace.to_dict()` 的结果持久化到文件
+- **完成内容**：
+  - 新增 `JSONFormatter`，当 log message 为 dict 时原样作为 JSON 顶层输出。
+  - 新增 `get_trace_logger(log_file="logs/traces.jsonl")`，自动创建目录并追加 JSON Lines。
+  - 新增 `write_trace(trace_dict, log_file=...)`，将 trace payload 写入一行合法 JSON。
+  - 避免同一路径重复注册 FileHandler，防止重复写行。
+  - 支持 `TraceCollector(sink=lambda payload: write_trace(payload, ...))` 持久化 trace。
 - **验收标准**：写入一条 trace 后文件新增一行合法 JSON，包含 `trace_type` 字段。
 - **测试方法**：`pytest -q tests/unit/test_jsonl_logger.py`。
 
