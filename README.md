@@ -49,6 +49,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone has completed the L
 - `E2` protocol handler: JSON-RPC request validation, initialize/tools/list/tools/call routing, tool schemas, standard error codes, and handler tests.
 - `E3` query knowledge hub tool: MCP tool registration, HybridSearch/CoreReranker execution, Markdown answers, structured citations, no-result response, and MCP integration tests.
 - `E4` list collections tool: MCP tool registration, document directory scanning, Chroma/Image index statistics, structured collection metadata, and stdio integration tests.
+- `E5` get document summary tool: MCP tool registration, Chroma metadata lookup by doc id/source name/hash, title/summary/tag aggregation, ingestion timestamp lookup, and stdio integration tests.
 
 ## Quick Check
 

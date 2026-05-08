@@ -113,9 +113,13 @@ class ProtocolHandler:
 
 def default_protocol_handler() -> ProtocolHandler:
     """Return the default protocol handler used by the stdio server."""
-    from mcp_server.tools import list_collections_tool_spec, query_knowledge_hub_tool_spec
+    from mcp_server.tools import (
+        get_document_summary_tool_spec,
+        list_collections_tool_spec,
+        query_knowledge_hub_tool_spec,
+    )
 
-    tools = [query_knowledge_hub_tool_spec(), list_collections_tool_spec()]
+    tools = [query_knowledge_hub_tool_spec(), list_collections_tool_spec(), get_document_summary_tool_spec()]
     return ProtocolHandler({tool.name: tool for tool in tools})
 
 

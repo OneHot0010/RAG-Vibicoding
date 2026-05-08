@@ -179,3 +179,48 @@ def test_list_collections_tool_call_returns_structured_collection_stats(tmp_path
     assert "docs" in result["content"][0]["text"]
     assert result["structuredContent"]["collections"][0]["name"] == "docs"
     assert result["structuredContent"]["collections"][0]["document_count"] == 1
+
+
+def test_get_document_summary_tool_call_returns_document_metadata(tmp_path: Path) -> None:
+    repo_root = Path(__file__).resolve().parents[2]
+    chroma = tmp_path / "data" / "db" / "chroma"
+    chroma.mkdir(parents=True)
+    (chroma / "records.json").write_text(
+        json.dumps(
+            [
+                {
+                    "id": "summary-chunk",
+                    "vector": [1.0],
+                    "text": "Knowledge hub summary text.",
+                    "metadata": {
+                        "source_path": "docs/guide.pdf",
+                        "collection": "docs",
+                        "chunk_index": 0,
+                        "title": "Guide",
+                        "summary": "A concise guide summary.",
+                        "tags": ["guide", "rag"],
+                    },
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+    request = {
+        "jsonrpc": "2.0",
+        "id": "summary",
+        "method": "tools/call",
+        "params": {
+            "name": "get_document_summary",
+            "arguments": {"doc_id": "guide.pdf", "data_dir": str(tmp_path / "data")},
+        },
+    }
+
+    completed = run_server(repo_root, json.dumps(request) + "\n")
+
+    assert completed.returncode == 0
+    response = json.loads(completed.stdout)
+    result = response["result"]
+    assert result["content"][0]["type"] == "text"
+    assert "Guide" in result["content"][0]["text"]
+    assert result["structuredContent"]["found"] is True
+    assert result["structuredContent"]["document"]["summary"] == "A concise guide summary."

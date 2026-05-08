@@ -179,4 +179,8 @@ def test_backward_compatible_helper_uses_default_handler() -> None:
 
     assert response["jsonrpc"] == "2.0"
     assert response["id"] == 1
-    assert [tool["name"] for tool in response["result"]["tools"]] == ["query_knowledge_hub", "list_collections"]
+    assert [tool["name"] for tool in response["result"]["tools"]] == [
+        "query_knowledge_hub",
+        "list_collections",
+        "get_document_summary",
+    ]

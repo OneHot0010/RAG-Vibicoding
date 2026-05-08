@@ -106,7 +106,7 @@
 | E2 | Protocol Handler 协议解析与能力协商 | [x] | 2026-05-08 | ProtocolHandler + initialize/tools/list/tools/call + JSON-RPC error mapping tests |
 | E3 | query_knowledge_hub Tool | [x] | 2026-05-08 | MCP query tool + ResponseBuilder/CitationGenerator + structured citations + integration tests |
 | E4 | list_collections Tool | [x] | 2026-05-08 | MCP collection listing tool + documents scan + Chroma/Image stats + structured metadata + integration tests |
-| E5 | get_document_summary Tool | [ ] | | |
+| E5 | get_document_summary Tool | [x] | 2026-05-08 | MCP document summary tool + doc_id/source/hash matching + metadata aggregation + ingestion timestamp lookup + integration tests |
 | E6 | 多模态返回组装（Text + Image） | [ ] | | |
 
 #### 阶段 F：Trace 基础设施与打点
@@ -160,12 +160,12 @@
 | 阶段 B | 16 | 16 | 100% |
 | 阶段 C | 15 | 15 | 100% |
 | 阶段 D | 7 | 7 | 100% |
-| 阶段 E | 6 | 4 | 67% |
+| 阶段 E | 6 | 5 | 83% |
 | 阶段 F | 5 | 0 | 0% |
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **45** | **66%** |
+| **总计** | **68** | **46** | **68%** |
 
 
 ---
@@ -940,12 +940,18 @@
 - **验收标准**：对 fixtures 中的目录结构能返回集合名列表；没有数据时返回空列表。
 - **测试方法**：`pytest -q tests/unit/test_list_collections.py`。
 
-### E5：实现 tool：get_document_summary
+### E5：实现 tool：get_document_summary ✅
 - **目标**：实现 `tools/get_document_summary.py`：按 doc_id 返回 title/summary/tags（可先从 metadata/缓存取）。
 - **修改文件**：
   - `src/mcp_server/tools/get_document_summary.py`
   - `tests/unit/test_get_document_summary.py`
-- **验收标准**：对不存在 doc_id 返回规范错误；存在时返回结构化信息。
+- **完成内容**：
+  - 注册 `get_document_summary` MCP Tool，默认 `tools/list` 可发现。
+  - 从 `data/db/chroma/records.json` 按 doc_id、source path、文件名、stem、file_hash 等匹配文档。
+  - 聚合 chunk metadata 中的 title、summary、tags、page、collection 与 chunk_ids。
+  - 从 `data/db/ingestion_history.db` 回填 processed_at 作为 created_at。
+  - 返回 Markdown 摘要和 `structuredContent.document` 结构化元数据。
+- **验收标准**：对不存在 doc_id 返回友好空结果；存在时返回结构化信息。
 - **测试方法**：`pytest -q tests/unit/test_get_document_summary.py`。
 
 ### E6：多模态返回组装（Text + Image）
