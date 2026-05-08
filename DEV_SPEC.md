@@ -2033,7 +2033,7 @@ dashboard:
 
 | 任务编号 | 任务名称 | 状态 | 完成日期 | 备注 |
 |---------|---------|------|---------|------|
-| G1 | Dashboard 基础架构与系统总览页 | [ ] | | |
+| G1 | Dashboard 基础架构与系统总览页 | [x] | 2026-05-08 | Streamlit app shell + six-page navigation + overview config cards/data stats + start script + unit tests |
 | G2 | DocumentManager 实现 | [ ] | | |
 | G3 | 数据浏览器页面 | [ ] | | |
 | G4 | Ingestion 管理页面 | [ ] | | |
@@ -2072,10 +2072,10 @@ dashboard:
 | 阶段 D | 7 | 7 | 100% |
 | 阶段 E | 6 | 6 | 100% |
 | 阶段 F | 5 | 5 | 100% |
-| 阶段 G | 6 | 0 | 0% |
+| 阶段 G | 6 | 1 | 17% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **52** | **76%** |
+| **总计** | **68** | **53** | **78%** |
 
 
 ---
@@ -3000,7 +3000,7 @@ dashboard:
 
 ## 阶段 G：可视化管理平台 Dashboard（目标：六页面完整可视化管理）
 
-### G1：Dashboard 基础架构与系统总览页
+### G1：Dashboard 基础架构与系统总览页 ✅
 - **目标**：搭建 Streamlit 多页面应用框架，实现系统总览页面（展示组件配置与数据统计）。
 - **前置依赖**：F1-F2（Trace 基础设施）
 - **修改文件**：
@@ -3009,11 +3009,17 @@ dashboard:
   - `src/observability/dashboard/services/config_service.py`（新增：配置读取服务）
   - `scripts/start_dashboard.py`（新增：Dashboard 启动脚本）
 - **实现要点**：
-  - `app.py` 使用 `st.navigation()` 注册六个页面（未完成的页面显示占位提示）
-  - Overview 页面：读取 `Settings` 展示组件卡片，调用 `ChromaStore.get_collection_stats()` 展示数据统计
+  - `app.py` 注册六个页面（未完成的页面显示占位提示）
+  - Overview 页面：读取 `Settings` 展示组件卡片，并展示本地数据资产统计
   - `ConfigService`：封装 Settings 读取，格式化组件配置信息
+- **完成内容**：
+  - 实现 Streamlit Dashboard 入口 `app.py`，包含 Overview/Data Browser/Ingestion Manager/Ingestion Traces/Query Traces/Evaluation 六页导航。
+  - 实现 Overview 页面模型与渲染函数，未传入 Streamlit 时可直接测试。
+  - 实现 `ConfigService`，封装 Settings 读取、组件卡片、文档/chunk/image/trace 统计。
+  - 新增 `scripts/start_dashboard.py`，通过 `python -m streamlit run ...` 启动，并在缺少 Streamlit 时给出可读提示。
+  - 新增 Dashboard overview 单测与 smoke import 覆盖。
 - **验收标准**：`streamlit run src/observability/dashboard/app.py` 可启动，总览页展示当前配置信息。
-- **测试方法**：手动运行 `python scripts/start_dashboard.py` 并验证页面渲染。
+- **测试方法**：`pytest -q tests/unit/test_dashboard_overview.py tests/unit/test_smoke_imports.py`；手动运行 `python scripts/start_dashboard.py` 验证页面渲染。
 
 ### G2：DocumentManager 实现
 - **目标**：实现 `src/ingestion/document_manager.py`：跨存储的文档生命周期管理（list/delete/stats）。
