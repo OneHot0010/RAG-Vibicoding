@@ -43,6 +43,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone has completed the L
 - `D3` sparse retrieval: VectorStore `get_by_ids`, Chroma record hydration, BM25 keyword retrieval, original chunk id mapping, trace hooks, and sparse retriever tests.
 - `D4` RRF fusion: dense/sparse rank fusion, configurable k, deterministic tie-breaking, contribution metadata, trace hooks, and fusion tests.
 - `D5` hybrid search: QueryProcessor/Dense/Sparse/RRF orchestration, metadata filter fallback, single-route degradation, trace events, and integration tests.
+- `D6` core reranker: RetrievalResult-to-reranker adapter, backend rerank integration, fusion-order fallback metadata, trace hooks, and fallback tests.
 
 ## Quick Check
 
