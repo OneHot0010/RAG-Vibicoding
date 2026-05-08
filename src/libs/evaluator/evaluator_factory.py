@@ -8,6 +8,7 @@ from core.settings import EvaluationSettings, Settings
 from libs.evaluator.base_evaluator import BaseEvaluator
 from libs.evaluator.custom_evaluator import CustomEvaluator
 from libs.evaluator.ragas_evaluator import RagasEvaluator
+from observability.evaluation.composite_evaluator import CompositeEvaluator, NamedEvaluator
 
 
 EvaluatorBuilder = Callable[[EvaluationSettings], BaseEvaluator]
@@ -58,12 +59,22 @@ class EvaluatorFactory:
     ) -> BaseEvaluator:
         """Create an evaluator from settings.
 
-        When backend is omitted, the first configured backend is used.
+        When backend is omitted and multiple backends are configured, a
+        CompositeEvaluator is returned. An explicit backend always creates just
+        that single backend.
         """
         evaluation_settings = settings.evaluation if isinstance(settings, Settings) else settings
+        if backend is None and len(evaluation_settings.backends) > 1:
+            return CompositeEvaluator(
+                NamedEvaluator(cls._normalize_backend(name), cls._create_one(evaluation_settings, name))
+                for name in evaluation_settings.backends
+            )
         selected_backend = backend or _first_backend(evaluation_settings)
-        normalized = cls._normalize_backend(selected_backend)
+        return cls._create_one(evaluation_settings, selected_backend)
 
+    @classmethod
+    def _create_one(cls, evaluation_settings: EvaluationSettings, selected_backend: str) -> BaseEvaluator:
+        normalized = cls._normalize_backend(selected_backend)
         try:
             builder = cls._backends[normalized]
         except KeyError as exc:

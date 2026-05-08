@@ -135,7 +135,7 @@
 | 任务编号 | 任务名称 | 状态 | 完成日期 | 备注 |
 |---------|---------|------|---------|------|
 | H1 | RagasEvaluator 实现 | [x] | 2026-05-08 | RagasEvaluator lazy optional adapter + metrics normalization + factory registration + trace hooks + mock-runner tests |
-| H2 | CompositeEvaluator 实现 | [ ] | | |
+| H2 | CompositeEvaluator 实现 | [x] | 2026-05-08 | CompositeEvaluator multi-backend orchestration + metric/detail merge + duplicate namespacing + factory auto-composition + tests |
 | H3 | EvalRunner + Golden Test Set | [ ] | | |
 | H4 | 评估面板页面 | [ ] | | |
 | H5 | Recall 回归测试（E2E） | [ ] | | |
@@ -163,9 +163,9 @@
 | 阶段 E | 6 | 6 | 100% |
 | 阶段 F | 5 | 5 | 100% |
 | 阶段 G | 6 | 6 | 100% |
-| 阶段 H | 5 | 1 | 20% |
+| 阶段 H | 5 | 2 | 40% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **59** | **87%** |
+| **总计** | **68** | **60** | **88%** |
 
 
 ---
@@ -1251,17 +1251,26 @@
 - **验收标准**：mock LLM 环境下，`evaluate()` 返回包含 faithfulness/answer_relevancy 的 metrics 字典。
 - **测试方法**：`pytest -q tests/unit/test_ragas_evaluator.py tests/unit/test_custom_evaluator.py tests/unit/test_smoke_imports.py`。
 
-### H2：CompositeEvaluator 实现
+### H2：CompositeEvaluator 实现 ✅
 - **目标**：实现 `composite_evaluator.py`：组合多个 Evaluator 并行执行，汇总结果。
 - **修改文件**：
-  - `src/observability/evaluation/composite_evaluator.py`（新增）
+  - `src/observability/evaluation/composite_evaluator.py`（实现）
+  - `src/observability/evaluation/__init__.py`（导出组合器）
+  - `src/libs/evaluator/evaluator_factory.py`（多 backend 自动组合）
   - `tests/unit/test_composite_evaluator.py`（新增）
+  - `tests/unit/test_smoke_imports.py`（补充导入）
 - **实现类/函数**：
   - `CompositeEvaluator.__init__(evaluators: List[BaseEvaluator])`
   - `CompositeEvaluator.evaluate() -> dict`：并行执行所有 evaluator，合并 metrics
   - 配置驱动：`evaluation.backends: [ragas, custom]` → 工厂自动组合
+- **完成内容**：
+  - 新增 `CompositeEvaluator` 与 `NamedEvaluator`，按顺序执行多个 `BaseEvaluator` 并合并 `EvaluationResult`。
+  - 合并 metrics 时保留首个指标名，重复指标自动使用 `{evaluator_name}.{metric}` 命名空间避免覆盖。
+  - details 中保留每个子 evaluator 的 name、metrics、details，便于评估报告展示。
+  - 评估时写入 `composite_evaluator.evaluate` trace stage。
+  - `EvaluatorFactory.create()` 在未显式指定 backend 且配置多个 backends 时自动返回 `CompositeEvaluator`；显式 backend 仍返回单个 evaluator。
 - **验收标准**：配置两个 evaluator 时，返回的 metrics 包含两者的指标。
-- **测试方法**：`pytest -q tests/unit/test_composite_evaluator.py`。
+- **测试方法**：`pytest -q tests/unit/test_composite_evaluator.py tests/unit/test_custom_evaluator.py tests/unit/test_ragas_evaluator.py tests/unit/test_smoke_imports.py`。
 
 ### H3：EvalRunner + Golden Test Set
 - **目标**：实现 `eval_runner.py`：读取 `tests/fixtures/golden_test_set.json`，跑 retrieval 并产出 metrics。

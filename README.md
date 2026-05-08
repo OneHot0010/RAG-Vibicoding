@@ -63,6 +63,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone has completed the L
 - `G5` ingestion traces: TraceService JSONL reader, ingestion history summaries, stage timing waterfall data, trace detail expansion, and page tests.
 - `G6` query traces: query history search, timing waterfall rows, Dense/Sparse route tables, fusion rows, rerank rank-delta view, and page tests.
 - `H1` Ragas evaluator: lazy optional Ragas adapter, faithfulness/answer relevancy/context precision metrics, factory registration, trace hooks, and mock-runner tests.
+- `H2` composite evaluator: multi-backend evaluator orchestration, metric/detail merging, duplicate metric namespacing, factory auto-composition, and tests.
 
 ## Quick Check
 
