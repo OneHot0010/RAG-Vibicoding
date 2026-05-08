@@ -113,7 +113,10 @@ class ProtocolHandler:
 
 def default_protocol_handler() -> ProtocolHandler:
     """Return the default protocol handler used by the stdio server."""
-    return ProtocolHandler()
+    from mcp_server.tools import query_knowledge_hub_tool_spec
+
+    tool = query_knowledge_hub_tool_spec()
+    return ProtocolHandler({tool.name: tool})
 
 
 def handle_jsonrpc_message(message: dict[str, Any]) -> dict[str, Any] | None:

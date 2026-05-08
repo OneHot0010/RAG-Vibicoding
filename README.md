@@ -47,6 +47,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone has completed the L
 - `D7` query CLI: `scripts/query.py` with query/top-k/collection/verbose/no-rerank options, offline embeddings, formatted results, no-data messaging, and e2e tests.
 - `E1` MCP stdio server: line-delimited JSON-RPC entry point, initialize response, stderr-only logging, clean stdout transport, and subprocess integration tests.
 - `E2` protocol handler: JSON-RPC request validation, initialize/tools/list/tools/call routing, tool schemas, standard error codes, and handler tests.
+- `E3` query knowledge hub tool: MCP tool registration, HybridSearch/CoreReranker execution, Markdown answers, structured citations, no-result response, and MCP integration tests.
 
 ## Quick Check
 

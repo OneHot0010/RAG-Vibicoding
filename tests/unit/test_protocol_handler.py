@@ -177,4 +177,6 @@ def test_handler_result_shape_error_is_internal_error() -> None:
 def test_backward_compatible_helper_uses_default_handler() -> None:
     response = handle_jsonrpc_message({"jsonrpc": "2.0", "id": 1, "method": "tools/list"})
 
-    assert response == {"jsonrpc": "2.0", "id": 1, "result": {"tools": []}}
+    assert response["jsonrpc"] == "2.0"
+    assert response["id"] == 1
+    assert [tool["name"] for tool in response["result"]["tools"]] == ["query_knowledge_hub"]
