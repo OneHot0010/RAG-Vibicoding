@@ -153,3 +153,29 @@ def test_query_knowledge_hub_tool_call_returns_markdown_and_citations(tmp_path: 
     assert result["structuredContent"]["citations"][0]["source"].endswith("azure.pdf")
     assert result["structuredContent"]["citations"][0]["chunk_id"]
     assert result["structuredContent"]["citations"][0]["score"] > 0
+
+
+def test_list_collections_tool_call_returns_structured_collection_stats(tmp_path: Path) -> None:
+    repo_root = Path(__file__).resolve().parents[2]
+    docs = tmp_path / "data" / "documents" / "docs"
+    docs.mkdir(parents=True)
+    (docs / "guide.md").write_text("guide", encoding="utf-8")
+    request = {
+        "jsonrpc": "2.0",
+        "id": "collections",
+        "method": "tools/call",
+        "params": {
+            "name": "list_collections",
+            "arguments": {"data_dir": str(tmp_path / "data")},
+        },
+    }
+
+    completed = run_server(repo_root, json.dumps(request) + "\n")
+
+    assert completed.returncode == 0
+    response = json.loads(completed.stdout)
+    result = response["result"]
+    assert result["content"][0]["type"] == "text"
+    assert "docs" in result["content"][0]["text"]
+    assert result["structuredContent"]["collections"][0]["name"] == "docs"
+    assert result["structuredContent"]["collections"][0]["document_count"] == 1

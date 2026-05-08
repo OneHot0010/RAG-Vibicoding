@@ -48,6 +48,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone has completed the L
 - `E1` MCP stdio server: line-delimited JSON-RPC entry point, initialize response, stderr-only logging, clean stdout transport, and subprocess integration tests.
 - `E2` protocol handler: JSON-RPC request validation, initialize/tools/list/tools/call routing, tool schemas, standard error codes, and handler tests.
 - `E3` query knowledge hub tool: MCP tool registration, HybridSearch/CoreReranker execution, Markdown answers, structured citations, no-result response, and MCP integration tests.
+- `E4` list collections tool: MCP tool registration, document directory scanning, Chroma/Image index statistics, structured collection metadata, and stdio integration tests.
 
 ## Quick Check
 
