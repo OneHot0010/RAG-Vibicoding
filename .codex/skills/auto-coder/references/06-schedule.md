@@ -134,7 +134,7 @@
 
 | 任务编号 | 任务名称 | 状态 | 完成日期 | 备注 |
 |---------|---------|------|---------|------|
-| H1 | RagasEvaluator 实现 | [ ] | | |
+| H1 | RagasEvaluator 实现 | [x] | 2026-05-08 | RagasEvaluator lazy optional adapter + metrics normalization + factory registration + trace hooks + mock-runner tests |
 | H2 | CompositeEvaluator 实现 | [ ] | | |
 | H3 | EvalRunner + Golden Test Set | [ ] | | |
 | H4 | 评估面板页面 | [ ] | | |
@@ -163,9 +163,9 @@
 | 阶段 E | 6 | 6 | 100% |
 | 阶段 F | 5 | 5 | 100% |
 | 阶段 G | 6 | 6 | 100% |
-| 阶段 H | 5 | 0 | 0% |
+| 阶段 H | 5 | 1 | 20% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **58** | **85%** |
+| **总计** | **68** | **59** | **87%** |
 
 
 ---
@@ -1228,18 +1228,28 @@
 
 ## 阶段 H：评估体系（目标：可插拔评估 + 可量化回归）
 
-### H1：RagasEvaluator 实现
+### H1：RagasEvaluator 实现 ✅
 - **目标**：实现 `ragas_evaluator.py`：封装 Ragas 框架，实现 `BaseEvaluator` 接口。
 - **修改文件**：
-  - `src/observability/evaluation/ragas_evaluator.py`（新增）
+  - `src/libs/evaluator/ragas_evaluator.py`（实现）
   - `src/libs/evaluator/evaluator_factory.py`（注册 ragas provider）
+  - `src/libs/evaluator/__init__.py`（导出 RagasEvaluator）
+  - `pyproject.toml`（新增 eval optional dependencies）
   - `tests/unit/test_ragas_evaluator.py`（新增）
+  - `tests/unit/test_smoke_imports.py`（补充导入）
 - **实现类/函数**：
   - `RagasEvaluator(BaseEvaluator)`：实现 `evaluate()` 方法
   - 支持指标：Faithfulness, Answer Relevancy, Context Precision
   - 优雅降级：Ragas 未安装时抛出明确的 `ImportError` 提示
+- **完成内容**：
+  - 新增 `RagasEvaluator`，兼容 `EvaluationCase`，从 metadata 中读取 answer/ground_truth/contexts。
+  - 真实 Ragas 依赖采用延迟导入；未安装 `ragas/datasets` 时给出明确安装提示。
+  - 支持注入 runner，便于 mock LLM/Ragas 环境下稳定单测。
+  - 规范化 `faithfulness`、`answer_relevancy`、`context_precision` 等指标为 `dict[str, float]`。
+  - 评估时写入 `ragas_evaluator.evaluate` trace stage。
+  - `EvaluatorFactory.reset_defaults()` 和默认 registry 已注册 `ragas` 后端。
 - **验收标准**：mock LLM 环境下，`evaluate()` 返回包含 faithfulness/answer_relevancy 的 metrics 字典。
-- **测试方法**：`pytest -q tests/unit/test_ragas_evaluator.py`。
+- **测试方法**：`pytest -q tests/unit/test_ragas_evaluator.py tests/unit/test_custom_evaluator.py tests/unit/test_smoke_imports.py`。
 
 ### H2：CompositeEvaluator 实现
 - **目标**：实现 `composite_evaluator.py`：组合多个 Evaluator 并行执行，汇总结果。

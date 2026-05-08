@@ -7,6 +7,7 @@ from typing import Callable, ClassVar
 from core.settings import EvaluationSettings, Settings
 from libs.evaluator.base_evaluator import BaseEvaluator
 from libs.evaluator.custom_evaluator import CustomEvaluator
+from libs.evaluator.ragas_evaluator import RagasEvaluator
 
 
 EvaluatorBuilder = Callable[[EvaluationSettings], BaseEvaluator]
@@ -20,7 +21,8 @@ class EvaluatorFactory:
     """Registry-backed factory for evaluator backends."""
 
     _backends: ClassVar[dict[str, EvaluatorBuilder]] = {
-        "custom": lambda settings: CustomEvaluator()
+        "custom": lambda settings: CustomEvaluator(),
+        "ragas": lambda settings: RagasEvaluator(),
     }
 
     @classmethod
@@ -43,7 +45,10 @@ class EvaluatorFactory:
     @classmethod
     def reset_defaults(cls) -> None:
         """Reset registrations to built-in defaults."""
-        cls._backends = {"custom": lambda settings: CustomEvaluator()}
+        cls._backends = {
+            "custom": lambda settings: CustomEvaluator(),
+            "ragas": lambda settings: RagasEvaluator(),
+        }
 
     @classmethod
     def create(

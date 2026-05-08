@@ -22,6 +22,7 @@ REPRESENTATIVE_MODULES = (
     "ingestion.pipeline",
     "libs.llm.base_llm",
     "libs.embedding.base_embedding",
+    "libs.evaluator.ragas_evaluator",
     "observability.logger",
     "observability.dashboard.app",
     "observability.dashboard.pages.data_browser",

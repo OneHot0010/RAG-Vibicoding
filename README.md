@@ -62,6 +62,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone has completed the L
 - `G4` ingestion manager: Dashboard PDF upload ingestion, progress callbacks, offline embedding pipeline builder, document deletion controls, and service/page tests.
 - `G5` ingestion traces: TraceService JSONL reader, ingestion history summaries, stage timing waterfall data, trace detail expansion, and page tests.
 - `G6` query traces: query history search, timing waterfall rows, Dense/Sparse route tables, fusion rows, rerank rank-delta view, and page tests.
+- `H1` Ragas evaluator: lazy optional Ragas adapter, faithfulness/answer relevancy/context precision metrics, factory registration, trace hooks, and mock-runner tests.
 
 ## Quick Check
 
