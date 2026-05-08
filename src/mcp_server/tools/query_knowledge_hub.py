@@ -10,11 +10,12 @@ from typing import Any
 from core.query_engine import CoreReranker, DenseRetriever, HybridSearch, QueryProcessor, RRFusion, SparseRetriever
 from core.response import MultimodalAssembler, ResponseBuilder
 from core.settings import Settings, load_settings
-from core.trace.trace_context import TraceContext
+from core.trace import TraceCollector, TraceContext
 from ingestion.storage import BM25Indexer
 from libs.embedding import BaseEmbedding
 from libs.vector_store import VectorStoreFactory
 from mcp_server.protocol_handler import INVALID_PARAMS, ProtocolError, ToolSpec
+from observability.logger import write_trace
 
 
 class LocalHashEmbedding(BaseEmbedding):
@@ -44,18 +45,45 @@ def query_knowledge_hub(arguments: dict[str, Any]) -> dict[str, Any]:
     data_dir = Path(str(arguments.get("data_dir", "data")))
     no_rerank = bool(arguments.get("no_rerank", False))
     online_embedding = bool(arguments.get("online_embedding", False))
+    trace_log_file = arguments.get("trace_log_file")
+    if trace_log_file is not None and (not isinstance(trace_log_file, str) or not trace_log_file.strip()):
+        raise ProtocolError(INVALID_PARAMS, "trace_log_file must be a non-empty string when provided")
 
+    trace = TraceContext(trace_type="query")
+    settings: Settings | None = None
+    results = []
     try:
         settings = load_settings(config)
         components = _build_components(settings, data_dir, offline_embedding=not online_embedding)
         filters = {"collection": collection.strip()} if isinstance(collection, str) else {}
-        trace = TraceContext()
+        trace.record_stage(
+            "query.start",
+            {
+                "query": query,
+                "top_k": top_k,
+                "filters": filters,
+                "entrypoint": "mcp",
+            },
+        )
         fused = components["hybrid"].search(query, top_k=top_k, filters=filters, trace=trace)
         results = fused if no_rerank else components["reranker"].rerank(query, fused, top_k=top_k, trace=trace)
+        trace.record_stage(
+            "query.completed",
+            {
+                "fused_count": len(fused),
+                "result_count": len(results),
+                "rerank_enabled": not no_rerank,
+            },
+        )
     except FileNotFoundError:
+        trace.record_stage("query.completed", {"result_count": 0, "fallback": "no_indexes"})
         results = []
+    finally:
+        _persist_query_trace(settings, trace, trace_log_file)
 
-    return ResponseBuilder(multimodal_assembler=MultimodalAssembler(data_dir=data_dir)).build(results, query).to_dict()
+    response = ResponseBuilder(multimodal_assembler=MultimodalAssembler(data_dir=data_dir)).build(results, query).to_dict()
+    response["structuredContent"]["trace"] = trace.to_dict()
+    return response
 
 
 def query_knowledge_hub_tool_spec() -> ToolSpec:
@@ -106,3 +134,12 @@ def _top_k(value: Any) -> int:
     if top_k <= 0:
         raise ProtocolError(INVALID_PARAMS, "top_k must be greater than 0")
     return top_k
+
+
+def _persist_query_trace(settings: Settings | None, trace: TraceContext, override_log_file: str | None = None) -> None:
+    if settings is not None and not settings.observability.enabled and override_log_file is None:
+        trace.finish()
+        return
+    log_file = override_log_file or (settings.observability.log_file if settings is not None else None)
+    collector = TraceCollector(sink=(lambda payload: write_trace(payload, log_file=log_file)) if log_file else None)
+    collector.collect(trace)

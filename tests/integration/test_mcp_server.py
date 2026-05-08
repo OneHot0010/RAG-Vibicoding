@@ -138,6 +138,7 @@ def test_query_knowledge_hub_tool_call_returns_markdown_and_citations(tmp_path: 
                 "top_k": 3,
                 "data_dir": str(data_dir),
                 "no_rerank": True,
+                "trace_log_file": str(tmp_path / "logs" / "traces.jsonl"),
             },
         },
     }
@@ -153,6 +154,14 @@ def test_query_knowledge_hub_tool_call_returns_markdown_and_citations(tmp_path: 
     assert result["structuredContent"]["citations"][0]["source"].endswith("azure.pdf")
     assert result["structuredContent"]["citations"][0]["chunk_id"]
     assert result["structuredContent"]["citations"][0]["score"] > 0
+    assert result["structuredContent"]["trace"]["trace_type"] == "query"
+    assert result["structuredContent"]["trace"]["finished_at"] is not None
+    rows = [
+        json.loads(line)
+        for line in (tmp_path / "logs" / "traces.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    assert rows[0]["trace_type"] == "query"
+    assert "query.completed" in [stage["name"] for stage in rows[0]["stages"]]
 
 
 def test_list_collections_tool_call_returns_structured_collection_stats(tmp_path: Path) -> None:

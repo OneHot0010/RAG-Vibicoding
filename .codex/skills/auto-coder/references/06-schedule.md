@@ -115,7 +115,7 @@
 |---------|---------|------|---------|------|
 | F1 | TraceContext 增强（finish + 耗时统计 + trace_type） | [x] | 2026-05-08 | TraceContext trace_type/finish/elapsed_ms/to_dict + compatibility-preserving stages + TraceCollector tests |
 | F2 | 结构化日志 logger（JSON Lines） | [x] | 2026-05-08 | JSONFormatter + get_trace_logger/write_trace + JSONL persistence + duplicate-handler guard + TraceCollector sink tests |
-| F3 | 在 Query 链路打点 | [ ] | | |
+| F3 | 在 Query 链路打点 | [x] | 2026-05-08 | CLI/MCP query trace_type=query + query lifecycle stages + JSONL persistence + MCP structured trace metadata |
 | F4 | 在 Ingestion 链路打点 | [ ] | | |
 | F5 | Pipeline 进度回调 (on_progress) | [ ] | | |
 
@@ -161,11 +161,11 @@
 | 阶段 C | 15 | 15 | 100% |
 | 阶段 D | 7 | 7 | 100% |
 | 阶段 E | 6 | 6 | 100% |
-| 阶段 F | 5 | 2 | 40% |
+| 阶段 F | 5 | 3 | 60% |
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **49** | **72%** |
+| **总计** | **68** | **50** | **74%** |
 
 
 ---
@@ -1020,19 +1020,28 @@
 - **验收标准**：写入一条 trace 后文件新增一行合法 JSON，包含 `trace_type` 字段。
 - **测试方法**：`pytest -q tests/unit/test_jsonl_logger.py`。
 
-### F3：在 Query 链路打点
+### F3：在 Query 链路打点 ✅
 - **目标**：在 HybridSearch/Rerank 中注入 TraceContext（`trace_type="query"`），利用 B 阶段抽象接口中预留的 `trace` 参数，显式调用 `trace.record_stage()` 记录各阶段数据。
 - **前置依赖**：D5（HybridSearch）、D6（Reranker）、F1（TraceContext 增强）、F2（结构化日志）
 - **修改文件**：
-  - `src/core/query_engine/hybrid_search.py`（增加 trace 记录：dense/sparse/fusion 阶段）
-  - `src/core/query_engine/reranker.py`（增加 trace 记录：rerank 阶段）
-  - `tests/integration/test_hybrid_search.py`（断言 trace 中存在各阶段）
+  - `scripts/query.py`（CLI 查询入口创建 query trace 并持久化 JSONL）
+  - `src/mcp_server/tools/query_knowledge_hub.py`（MCP Tool 创建 query trace、持久化并返回 structured trace）
+  - `tests/e2e/test_query_cli.py`（断言 CLI trace JSONL）
+  - `tests/integration/test_mcp_server.py`（断言 MCP trace 返回与落盘）
 - **说明**：B 阶段的接口已预留 `trace: TraceContext | None = None` 参数，本任务负责在调用时传入实际的 TraceContext 实例，并在各阶段记录 `method`/`provider`/`details` 字段。
+- **完成内容**：
+  - CLI 与 MCP 查询入口统一创建 `TraceContext(trace_type="query")`。
+  - 查询开始记录 `query.start`，包含 query/top_k/filters/entrypoint。
+  - Core 层已有 QueryProcessor、Dense/Sparse Retriever、RRFusion、CoreReranker 阶段记录被纳入完整 trace。
+  - 查询结束记录 `query.completed`，包含 fused_count/result_count/rerank_enabled。
+  - 查询失败记录 `query.failed`，无索引时记录 `fallback=no_indexes`。
+  - 通过 `TraceCollector + write_trace()` 将 query trace 持久化为 JSON Lines。
+  - MCP `query_knowledge_hub` 响应新增 `structuredContent.trace`。
 - **验收标准**：
   - 一次查询生成 trace，包含 `query_processing`/`dense_retrieval`/`sparse_retrieval`/`fusion`/`rerank` 阶段
   - 每个阶段记录 `elapsed_ms` 耗时字段和 `method` 字段
   - `trace.to_dict()` 中 `trace_type == "query"`
-- **测试方法**：`pytest -q tests/integration/test_hybrid_search.py`。
+- **测试方法**：`pytest -q tests/e2e/test_query_cli.py tests/integration/test_mcp_server.py tests/integration/test_hybrid_search.py`。
 
 ### F4：在 Ingestion 链路打点
 - **目标**：在 IngestionPipeline 中注入 TraceContext（`trace_type="ingestion"`），记录各摄取阶段的处理数据。

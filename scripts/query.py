@@ -17,11 +17,12 @@ if str(SRC_ROOT) not in sys.path:
 
 from core.query_engine import CoreReranker, DenseRetriever, HybridSearch, QueryProcessor, RRFusion, SparseRetriever
 from core.settings import Settings, load_settings
-from core.trace.trace_context import TraceContext
+from core.trace import TraceCollector, TraceContext
 from core.types import RetrievalResult
 from ingestion.storage import BM25Indexer
 from libs.embedding import BaseEmbedding
 from libs.vector_store import VectorStoreFactory
+from observability.logger import write_trace
 
 
 NO_DATA_MESSAGE = "未找到相关文档，请先运行 ingest.py 摄取数据。"
@@ -53,22 +54,47 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     filters = {"collection": args.collection} if args.collection else {}
-    trace = TraceContext()
+    trace = TraceContext(trace_type="query")
+    settings: Settings | None = None
+    fused_results: list[RetrievalResult] = []
+    results: list[RetrievalResult] = []
 
     try:
         settings = load_settings(args.config)
+        trace.record_stage(
+            "query.start",
+            {
+                "query": args.query,
+                "top_k": args.top_k,
+                "filters": filters,
+                "entrypoint": "cli",
+            },
+        )
         components = build_query_components(settings, args.data_dir, offline_embedding=not args.online_embedding)
         fused_results = components.hybrid_search.search(args.query, top_k=args.top_k, filters=filters, trace=trace)
         results = fused_results if args.no_rerank else components.reranker.rerank(
             args.query, fused_results, top_k=args.top_k, trace=trace
         )
+        trace.record_stage(
+            "query.completed",
+            {
+                "fused_count": len(fused_results),
+                "result_count": len(results),
+                "rerank_enabled": not args.no_rerank,
+            },
+        )
     except FileNotFoundError:
+        trace.record_stage("query.completed", {"result_count": 0, "fallback": "no_indexes"})
+        _persist_query_trace(settings, trace, args.trace_log_file)
         print(NO_DATA_MESSAGE)
         return 0
     except Exception as exc:
+        trace.record_stage("query.failed", {"error": str(exc)})
+        _persist_query_trace(settings, trace, args.trace_log_file)
         print(f"query failed: {exc}", file=sys.stderr)
         return 1
 
+    _persist_query_trace(settings, trace, args.trace_log_file)
     if not results:
         print(NO_DATA_MESSAGE)
         if args.verbose:
@@ -90,6 +116,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--no-rerank", action="store_true", help="Skip reranker stage and return fused results.")
     parser.add_argument("--config", default="config/settings.yaml", help="Settings YAML path.")
     parser.add_argument("--data-dir", default="data", help="Root directory containing local indexes.")
+    parser.add_argument("--trace-log-file", help="Override the JSON Lines trace log path.")
     parser.add_argument(
         "--online-embedding",
         action="store_true",
@@ -150,7 +177,7 @@ def _format_verbose(
     final_results: list[RetrievalResult],
 ) -> str:
     payload = {
-        "trace": trace.stages,
+        "trace": trace.to_dict(),
         "fusion_results": [result.to_dict() for result in fused_results],
         "rerank_results": [result.to_dict() for result in final_results],
     }
@@ -162,6 +189,15 @@ def _summarize(text: str, limit: int = 180) -> str:
     if len(clean) <= limit:
         return clean
     return f"{clean[: limit - 3]}..."
+
+
+def _persist_query_trace(settings: Settings | None, trace: TraceContext, override_log_file: str | None = None) -> None:
+    if settings is not None and not settings.observability.enabled and override_log_file is None:
+        trace.finish()
+        return
+    log_file = override_log_file or (settings.observability.log_file if settings is not None else None)
+    collector = TraceCollector(sink=(lambda payload: write_trace(payload, log_file=log_file)) if log_file else None)
+    collector.collect(trace)
 
 
 if __name__ == "__main__":

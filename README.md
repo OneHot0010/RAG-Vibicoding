@@ -53,6 +53,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone has completed the L
 - `E6` multimodal response assembly: image ref resolution from chunk metadata/ImageStorage, base64 MCP ImageContent, mime type detection, skipped-image metadata, and ResponseBuilder integration tests.
 - `F1` trace context enhancement: query/ingestion trace types, finish/elapsed timing, JSON-safe serialization, compatibility-preserving stage records, and TraceCollector tests.
 - `F2` JSON Lines trace logger: JSONFormatter, trace file handler, write_trace persistence, duplicate-handler protection, and TraceCollector sink integration tests.
+- `F3` query trace integration: CLI/MCP query entrypoints create query traces, record query lifecycle stages, persist JSONL traces, and expose MCP structured trace metadata.
 
 ## Quick Check
 
