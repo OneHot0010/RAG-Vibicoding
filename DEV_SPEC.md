@@ -2037,7 +2037,7 @@ dashboard:
 | G2 | DocumentManager 实现 | [x] | 2026-05-08 | DocumentManager list/detail/delete/stats + cross-store JSON/SQLite coordination + DataService wrappers + unit tests |
 | G3 | 数据浏览器页面 | [x] | 2026-05-08 | Streamlit data browser page + collection/search filters + document detail + chunk metadata/image preview rows + unit tests |
 | G4 | Ingestion 管理页面 | [x] | 2026-05-08 | Dashboard upload ingestion + progress callback UI + offline pipeline service + document deletion controls + unit tests |
-| G5 | Ingestion 追踪页面 | [ ] | | |
+| G5 | Ingestion 追踪页面 | [x] | 2026-05-08 | TraceService JSONL reader + ingestion history summaries + stage timing waterfall rows + trace detail expansion + unit tests |
 | G6 | Query 追踪页面 | [ ] | | |
 
 #### 阶段 H：评估体系
@@ -2072,10 +2072,10 @@ dashboard:
 | 阶段 D | 7 | 7 | 100% |
 | 阶段 E | 6 | 6 | 100% |
 | 阶段 F | 5 | 5 | 100% |
-| 阶段 G | 6 | 4 | 67% |
+| 阶段 G | 6 | 5 | 83% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **56** | **82%** |
+| **总计** | **68** | **57** | **84%** |
 
 
 ---
@@ -3090,18 +3090,27 @@ dashboard:
 - **验收标准**：可在 Dashboard 中上传文件触发摄取、看到实时进度条、删除已有文档。
 - **测试方法**：`pytest -q tests/unit/test_dashboard_ingestion_manager.py tests/unit/test_dashboard_data_browser.py tests/unit/test_dashboard_overview.py tests/unit/test_smoke_imports.py`。
 
-### G5：Ingestion 追踪页面
+### G5：Ingestion 追踪页面 ✅
 - **目标**：实现 Dashboard Ingestion 追踪页面（摄取历史列表、阶段耗时瀑布图）。
 - **前置依赖**：F4（Ingestion 打点）、G1（Dashboard 架构）
 - **修改文件**：
-  - `src/observability/dashboard/pages/ingestion_traces.py`（新增）
-  - `src/observability/dashboard/services/trace_service.py`（新增：解析 traces.jsonl）
+  - `src/observability/dashboard/pages/ingestion_traces.py`（实现）
+  - `src/observability/dashboard/services/trace_service.py`（实现）
+  - `src/observability/dashboard/app.py`（Ingestion Traces 导航接入真实页面）
+  - `tests/unit/test_dashboard_ingestion_traces.py`（新增）
+  - `tests/unit/test_smoke_imports.py`（补充页面与服务导入）
 - **实现要点**：
   - 历史列表：按时间倒序展示 `trace_type == "ingestion"` 记录
   - 详情页：横向条形图展示 load/split/transform/embed/upsert 耗时分布
   - `TraceService`：读取 `logs/traces.jsonl`，解析为 Trace 对象列表
+- **完成内容**：
+  - 新增 `TraceService`，支持 JSON Lines 读取、坏行跳过、按 trace_type 过滤、trace 摘要、stage rows、单 trace 查询。
+  - 新增 `ingestion_traces_model()`，生成摄取历史、选中 trace、阶段耗时瀑布数据、处理统计。
+  - Streamlit 页面支持摄取历史表、trace 选择、状态/耗时/集合指标、阶段耗时条形图、阶段详情展开。
+  - Dashboard `page_registry()` 的 Ingestion Traces 已从占位页切换为 `ingestion_traces.render()`。
+  - 补充单测覆盖 ingestion trace 过滤、倒序排序、状态识别、source/collection 提取、stage detail 和页面模型。
 - **验收标准**：执行 ingest 后，Dashboard 显示对应的追踪记录与耗时瀑布图。
-- **测试方法**：手动验证（先 ingest → 打开 Dashboard → 查看追踪）。
+- **测试方法**：`pytest -q tests/unit/test_dashboard_ingestion_traces.py tests/unit/test_dashboard_ingestion_manager.py tests/unit/test_dashboard_overview.py tests/unit/test_smoke_imports.py`。
 
 ### G6：Query 追踪页面
 - **目标**：实现 Dashboard Query 追踪页面（查询历史、Dense/Sparse 对比、Rerank 变化）。
