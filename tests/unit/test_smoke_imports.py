@@ -18,6 +18,7 @@ REPRESENTATIVE_MODULES = (
     "mcp_server.server",
     "core.settings",
     "core.types",
+    "ingestion.document_manager",
     "ingestion.pipeline",
     "libs.llm.base_llm",
     "libs.embedding.base_embedding",
@@ -25,6 +26,7 @@ REPRESENTATIVE_MODULES = (
     "observability.dashboard.app",
     "observability.dashboard.pages.overview",
     "observability.dashboard.services.config_service",
+    "observability.dashboard.services.data_service",
 )
 
 

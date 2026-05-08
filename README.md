@@ -57,6 +57,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone has completed the L
 - `F4` ingestion trace integration: ingest CLI creates ingestion traces per file, records pipeline lifecycle stages, persists JSONL traces, and keeps pipeline default traces typed as ingestion.
 - `F5` pipeline progress callbacks: optional `on_progress(stage, current, total)` support for ingestion stages, skip/failure completion events, and progress callback tests.
 - `G1` dashboard foundation: Streamlit entrypoint, six-page navigation shell, overview model/page, configuration cards, data asset statistics, and start script.
+- `G2` document manager: list/detail/delete/stats across Chroma records, BM25 index, ImageStorage, ingestion history, plus Dashboard DataService wrappers.
 
 ## Quick Check
 

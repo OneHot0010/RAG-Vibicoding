@@ -2034,7 +2034,7 @@ dashboard:
 | 任务编号 | 任务名称 | 状态 | 完成日期 | 备注 |
 |---------|---------|------|---------|------|
 | G1 | Dashboard 基础架构与系统总览页 | [x] | 2026-05-08 | Streamlit app shell + six-page navigation + overview config cards/data stats + start script + unit tests |
-| G2 | DocumentManager 实现 | [ ] | | |
+| G2 | DocumentManager 实现 | [x] | 2026-05-08 | DocumentManager list/detail/delete/stats + cross-store JSON/SQLite coordination + DataService wrappers + unit tests |
 | G3 | 数据浏览器页面 | [ ] | | |
 | G4 | Ingestion 管理页面 | [ ] | | |
 | G5 | Ingestion 追踪页面 | [ ] | | |
@@ -2072,10 +2072,10 @@ dashboard:
 | 阶段 D | 7 | 7 | 100% |
 | 阶段 E | 6 | 6 | 100% |
 | 阶段 F | 5 | 5 | 100% |
-| 阶段 G | 6 | 1 | 17% |
+| 阶段 G | 6 | 2 | 33% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **53** | **78%** |
+| **总计** | **68** | **54** | **79%** |
 
 
 ---
@@ -3021,21 +3021,27 @@ dashboard:
 - **验收标准**：`streamlit run src/observability/dashboard/app.py` 可启动，总览页展示当前配置信息。
 - **测试方法**：`pytest -q tests/unit/test_dashboard_overview.py tests/unit/test_smoke_imports.py`；手动运行 `python scripts/start_dashboard.py` 验证页面渲染。
 
-### G2：DocumentManager 实现
+### G2：DocumentManager 实现 ✅
 - **目标**：实现 `src/ingestion/document_manager.py`：跨存储的文档生命周期管理（list/delete/stats）。
 - **前置依赖**：C5（Pipeline + 各存储模块已就绪）
 - **修改文件**：
   - `src/ingestion/document_manager.py`（新增）
-  - `src/libs/vector_store/chroma_store.py`（增强：添加 `delete_by_metadata`）
-  - `src/ingestion/storage/bm25_indexer.py`（增强：添加 `remove_document`）
-  - `src/libs/loader/file_integrity.py`（增强：添加 `remove_record` + `list_processed`）
+  - `src/observability/dashboard/services/data_service.py`（封装 DocumentManager）
   - `tests/unit/test_document_manager.py`（新增）
 - **实现类/函数**：
-  - `DocumentManager.__init__(chroma_store, bm25_indexer, image_storage, file_integrity)`
+  - `DocumentManager.__init__(data_dir="data")`
   - `DocumentManager.list_documents(collection?) -> List[DocumentInfo]`
   - `DocumentManager.get_document_detail(doc_id) -> DocumentDetail`
   - `DocumentManager.delete_document(source_path, collection) -> DeleteResult`
   - `DocumentManager.get_collection_stats(collection?) -> CollectionStats`
+  - `DataService.list_documents/get_document_detail/delete_document/get_collection_stats`
+- **完成内容**：
+  - 聚合 Chroma `records.json` 中的 source_path/collection/file_hash/chunk 信息。
+  - 从 ImageStorage 汇总每个文档图片数量。
+  - 从 `ingestion_history.db` 回填 processed_at。
+  - 支持按 source path、文件名、stem、hash 查询文档详情。
+  - 删除文档时协调更新 Chroma records、BM25 records/index、ImageStorage 文件与索引、ingestion_history。
+  - 删除后 `list_documents()` 不再返回该文档。
 - **验收标准**：
   - `list_documents` 返回已摄入文档列表（source、chunk 数、图片数）
   - `delete_document` 协调删除 Chroma + BM25 + ImageStorage + FileIntegrity 四个存储
