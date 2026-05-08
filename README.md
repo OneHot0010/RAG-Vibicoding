@@ -41,6 +41,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone has completed the L
 - `D1` query processing: `ProcessedQuery`, keyword extraction, inline/explicit metadata filters, value coercion, trace hooks, and preprocessing tests.
 - `D2` dense retrieval: `RetrievalResult`, query embedding orchestration, VectorStore querying, metadata filters, trace hooks, and mock retriever tests.
 - `D3` sparse retrieval: VectorStore `get_by_ids`, Chroma record hydration, BM25 keyword retrieval, original chunk id mapping, trace hooks, and sparse retriever tests.
+- `D4` RRF fusion: dense/sparse rank fusion, configurable k, deterministic tie-breaking, contribution metadata, trace hooks, and fusion tests.
 
 ## Quick Check
 
