@@ -24,6 +24,7 @@ REPRESENTATIVE_MODULES = (
     "libs.embedding.base_embedding",
     "observability.logger",
     "observability.dashboard.app",
+    "observability.dashboard.pages.data_browser",
     "observability.dashboard.pages.overview",
     "observability.dashboard.services.config_service",
     "observability.dashboard.services.data_service",

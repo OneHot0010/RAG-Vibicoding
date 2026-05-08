@@ -2035,7 +2035,7 @@ dashboard:
 |---------|---------|------|---------|------|
 | G1 | Dashboard 基础架构与系统总览页 | [x] | 2026-05-08 | Streamlit app shell + six-page navigation + overview config cards/data stats + start script + unit tests |
 | G2 | DocumentManager 实现 | [x] | 2026-05-08 | DocumentManager list/detail/delete/stats + cross-store JSON/SQLite coordination + DataService wrappers + unit tests |
-| G3 | 数据浏览器页面 | [ ] | | |
+| G3 | 数据浏览器页面 | [x] | 2026-05-08 | Streamlit data browser page + collection/search filters + document detail + chunk metadata/image preview rows + unit tests |
 | G4 | Ingestion 管理页面 | [ ] | | |
 | G5 | Ingestion 追踪页面 | [ ] | | |
 | G6 | Query 追踪页面 | [ ] | | |
@@ -2072,10 +2072,10 @@ dashboard:
 | 阶段 D | 7 | 7 | 100% |
 | 阶段 E | 6 | 6 | 100% |
 | 阶段 F | 5 | 5 | 100% |
-| 阶段 G | 6 | 2 | 33% |
+| 阶段 G | 6 | 3 | 50% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **54** | **79%** |
+| **总计** | **68** | **55** | **81%** |
 
 
 ---
@@ -3048,18 +3048,25 @@ dashboard:
   - 删除后再次 list 不包含已删除文档
 - **测试方法**：`pytest -q tests/unit/test_document_manager.py`。
 
-### G3：数据浏览器页面
+### G3：数据浏览器页面 ✅
 - **目标**：实现 Dashboard 数据浏览器页面（查看文档列表、Chunk 详情、图片预览）。
 - **前置依赖**：G1（Dashboard 架构）、G2（DocumentManager）
 - **修改文件**：
-  - `src/observability/dashboard/pages/data_browser.py`（新增）
-  - `src/observability/dashboard/services/data_service.py`（新增：封装 ChromaStore/ImageStorage 读取）
+  - `src/observability/dashboard/pages/data_browser.py`（实现）
+  - `src/observability/dashboard/app.py`（Data Browser 导航接入真实页面）
+  - `tests/unit/test_dashboard_data_browser.py`（新增）
+  - `tests/unit/test_smoke_imports.py`（补充页面导入）
 - **实现要点**：
   - 文档列表视图：展示 source_path、集合、chunk 数、摄入时间；支持集合筛选
   - Chunk 详情视图：点击文档展开所有 chunk，显示内容（可折叠）、metadata 字段、关联图片
-  - `DataService`：封装 `ChromaStore.get_by_metadata()` 和 `ImageStorage.list_images()` 调用
+  - `DataService`：复用 G2 的 `DocumentManager` 封装文档、chunk、图片读取
+- **完成内容**：
+  - 新增 `data_browser_model()`，生成可测试的文档列表、集合筛选、搜索过滤、选中文档、chunk 行、image 行。
+  - 新增 Streamlit 渲染：集合下拉、搜索框、文档表格、文档选择、chunk 折叠详情、metadata JSON、图片索引与可用文件预览。
+  - Dashboard `page_registry()` 的 Data Browser 已从占位页切换为 `data_browser.render()`。
+  - 补充模型级单测覆盖集合筛选、搜索、hash 选中、chunk/image 行格式。
 - **验收标准**：可在 Dashboard 中浏览已摄入的文档和 chunk 详情。
-- **测试方法**：手动验证（先 ingest 样例数据，再在 Dashboard 浏览）。
+- **测试方法**：`pytest -q tests/unit/test_dashboard_data_browser.py tests/unit/test_dashboard_overview.py tests/unit/test_smoke_imports.py`。
 
 ### G4：Ingestion 管理页面
 - **目标**：实现 Dashboard Ingestion 管理页面（文件上传触发摄取、进度展示、文档删除）。

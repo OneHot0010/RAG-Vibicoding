@@ -11,7 +11,7 @@ if __package__ in {None, ""}:
     if str(src_root) not in sys.path:
         sys.path.insert(0, str(src_root))
 
-from observability.dashboard.pages import overview
+from observability.dashboard.pages import data_browser, overview
 
 
 PageRenderer = Callable[[Any], None]
@@ -21,7 +21,7 @@ def page_registry() -> dict[str, PageRenderer]:
     """Return dashboard page renderers in navigation order."""
     return {
         "Overview": lambda st: overview.render(st),
-        "Data Browser": lambda st: _placeholder(st, "Data Browser"),
+        "Data Browser": lambda st: data_browser.render(st),
         "Ingestion Manager": lambda st: _placeholder(st, "Ingestion Manager"),
         "Ingestion Traces": lambda st: _placeholder(st, "Ingestion Traces"),
         "Query Traces": lambda st: _placeholder(st, "Query Traces"),
