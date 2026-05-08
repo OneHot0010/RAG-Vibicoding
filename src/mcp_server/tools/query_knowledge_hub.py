@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from core.query_engine import CoreReranker, DenseRetriever, HybridSearch, QueryProcessor, RRFusion, SparseRetriever
-from core.response import ResponseBuilder
+from core.response import MultimodalAssembler, ResponseBuilder
 from core.settings import Settings, load_settings
 from core.trace.trace_context import TraceContext
 from ingestion.storage import BM25Indexer
@@ -55,7 +55,7 @@ def query_knowledge_hub(arguments: dict[str, Any]) -> dict[str, Any]:
     except FileNotFoundError:
         results = []
 
-    return ResponseBuilder().build(results, query).to_dict()
+    return ResponseBuilder(multimodal_assembler=MultimodalAssembler(data_dir=data_dir)).build(results, query).to_dict()
 
 
 def query_knowledge_hub_tool_spec() -> ToolSpec:

@@ -49,6 +49,7 @@ def test_response_builder_returns_markdown_with_citation_markers() -> None:
         "score": 0.9,
     }
     assert payload["structuredContent"]["results"][0]["chunk_id"] == "chunk-a"
+    assert payload["structuredContent"]["multimodal"] == {"images": [], "skipped": []}
 
 
 def test_response_builder_no_results_is_friendly_message() -> None:

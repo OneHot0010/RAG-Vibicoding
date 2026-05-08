@@ -50,6 +50,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone has completed the L
 - `E3` query knowledge hub tool: MCP tool registration, HybridSearch/CoreReranker execution, Markdown answers, structured citations, no-result response, and MCP integration tests.
 - `E4` list collections tool: MCP tool registration, document directory scanning, Chroma/Image index statistics, structured collection metadata, and stdio integration tests.
 - `E5` get document summary tool: MCP tool registration, Chroma metadata lookup by doc id/source name/hash, title/summary/tag aggregation, ingestion timestamp lookup, and stdio integration tests.
+- `E6` multimodal response assembly: image ref resolution from chunk metadata/ImageStorage, base64 MCP ImageContent, mime type detection, skipped-image metadata, and ResponseBuilder integration tests.
 
 ## Quick Check
 

@@ -2017,7 +2017,7 @@ dashboard:
 | E3 | query_knowledge_hub Tool | [x] | 2026-05-08 | MCP query tool + ResponseBuilder/CitationGenerator + structured citations + integration tests |
 | E4 | list_collections Tool | [x] | 2026-05-08 | MCP collection listing tool + documents scan + Chroma/Image stats + structured metadata + integration tests |
 | E5 | get_document_summary Tool | [x] | 2026-05-08 | MCP document summary tool + doc_id/source/hash matching + metadata aggregation + ingestion timestamp lookup + integration tests |
-| E6 | 多模态返回组装（Text + Image） | [ ] | | |
+| E6 | 多模态返回组装（Text + Image） | [x] | 2026-05-08 | MultimodalAssembler + image_refs/ImageStorage path resolution + base64 ImageContent + ResponseBuilder integration tests |
 
 #### 阶段 F：Trace 基础设施与打点
 
@@ -2070,12 +2070,12 @@ dashboard:
 | 阶段 B | 16 | 16 | 100% |
 | 阶段 C | 15 | 15 | 100% |
 | 阶段 D | 7 | 7 | 100% |
-| 阶段 E | 6 | 5 | 83% |
+| 阶段 E | 6 | 6 | 100% |
 | 阶段 F | 5 | 0 | 0% |
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **46** | **68%** |
+| **总计** | **68** | **47** | **69%** |
 
 
 ---
@@ -2864,13 +2864,20 @@ dashboard:
 - **验收标准**：对不存在 doc_id 返回友好空结果；存在时返回结构化信息。
 - **测试方法**：`pytest -q tests/unit/test_get_document_summary.py`。
 
-### E6：多模态返回组装（Text + Image）
+### E6：多模态返回组装（Text + Image） ✅
 - **目标**：实现 `multimodal_assembler.py`：命中 chunk 含 image_refs 时读取图片并 base64 返回 ImageContent。
 - **修改文件**：
   - `src/core/response/multimodal_assembler.py`
-  - `tests/integration/test_mcp_server.py`（补图像返回用例）
+  - `tests/unit/test_multimodal_assembler.py`
+  - `tests/unit/test_response_builder.py`
+- **完成内容**：
+  - 实现 `MultimodalAssembler`，从命中 chunk 的 `image_refs/images` 解析图片引用。
+  - 支持直接使用 chunk metadata 中的图片路径，也可回退读取 `data/db/image_index.db`。
+  - 将图片读取为 base64，生成 MCP `ImageContent`：`type=image`、`mimeType`、`data`。
+  - 在 `structuredContent.multimodal` 中记录已返回图片和 skipped 图片原因。
+  - 集成 `ResponseBuilder`，查询响应可同时返回 TextContent 与 ImageContent。
 - **验收标准**：返回 content 中包含 image type，mimeType 正确，data 为 base64 字符串。
-- **测试方法**：`pytest -q tests/integration/test_mcp_server.py -k image`。
+- **测试方法**：`pytest -q tests/unit/test_multimodal_assembler.py tests/unit/test_response_builder.py`。
 
 ---
 

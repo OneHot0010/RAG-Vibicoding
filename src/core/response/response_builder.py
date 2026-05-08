@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from core.response.citation_generator import CitationGenerator
+from core.response.multimodal_assembler import MultimodalAssembler
 from core.types import RetrievalResult
 
 
@@ -27,8 +28,13 @@ class MCPResponse:
 class ResponseBuilder:
     """Construct readable Markdown plus structured citations."""
 
-    def __init__(self, citation_generator: CitationGenerator | None = None) -> None:
+    def __init__(
+        self,
+        citation_generator: CitationGenerator | None = None,
+        multimodal_assembler: MultimodalAssembler | None = None,
+    ) -> None:
         self.citation_generator = citation_generator or CitationGenerator()
+        self.multimodal_assembler = multimodal_assembler or MultimodalAssembler()
 
     def build(self, retrieval_results: list[RetrievalResult], query: str) -> MCPResponse:
         """Build an MCP response for a query."""
@@ -42,12 +48,14 @@ class ResponseBuilder:
 
         citations = self.citation_generator.generate(retrieval_results)
         text = _markdown_results(retrieval_results, citations, query)
+        multimodal = self.multimodal_assembler.assemble(retrieval_results)
         return MCPResponse(
-            content=[{"type": "text", "text": text}],
+            content=[{"type": "text", "text": text}, *multimodal.to_content()],
             structuredContent={
                 "query": query,
                 "citations": [citation.to_dict() for citation in citations],
                 "results": [result.to_dict() for result in retrieval_results],
+                "multimodal": multimodal.to_dict(),
             },
         )
 
