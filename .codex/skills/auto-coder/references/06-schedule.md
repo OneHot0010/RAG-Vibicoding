@@ -146,7 +146,7 @@
 |---------|---------|------|---------|------|
 | I1 | E2E：MCP Client 侧调用模拟 | [x] | 2026-05-09 | Long-lived stdio MCP client simulation + initialize/tools/list/query_knowledge_hub tools/call + citations assertions |
 | I2 | E2E：Dashboard 冒烟测试 | [x] | 2026-05-09 | Seeded Dashboard six-page smoke rendering + optional Streamlit AppTest coverage + no Python exceptions |
-| I3 | 完善 README（运行说明 + MCP + Dashboard） | [ ] | | |
+| I3 | 完善 README（运行说明 + MCP + Dashboard） | [x] | 2026-05-09 | Quick start + config guide + CLI/MCP/Dashboard usage + tests + troubleshooting |
 | I4 | 清理接口一致性（契约测试补齐） | [ ] | | |
 | I5 | 全链路 E2E 验收 | [ ] | | |
 
@@ -164,8 +164,8 @@
 | 阶段 F | 5 | 5 | 100% |
 | 阶段 G | 6 | 6 | 100% |
 | 阶段 H | 5 | 5 | 100% |
-| 阶段 I | 5 | 2 | 40% |
-| **总计** | **68** | **65** | **96%** |
+| 阶段 I | 5 | 3 | 60% |
+| **总计** | **68** | **66** | **97%** |
 
 
 ---
@@ -1378,7 +1378,7 @@
 - **验收标准**：所有页面冒烟测试通过。
 - **测试方法**：`pytest -q tests/e2e/test_dashboard_smoke.py`。
 
-### I3：完善 README（运行说明 + 测试说明 + MCP 配置 + Dashboard 使用）
+### I3：完善 README（运行说明 + 测试说明 + MCP 配置 + Dashboard 使用） ✅
 - **目标**：让新用户能在 10 分钟内跑通 ingest + query + dashboard + tests，并能在 Copilot/Claude 中使用。
 - **修改文件**：
   - `README.md`
@@ -1389,6 +1389,12 @@
   - **Dashboard 使用指南**：启动命令、各页面功能说明、截图示例
   - **运行测试**：单元测试、集成测试、E2E 测试命令
   - **常见问题**：API Key 配置、依赖安装、连接问题排查
+- **完成内容**：
+  - 重写 README 为面向使用者的运行手册，包含 Quick Start、配置说明、CLI、MCP Server、Dashboard、测试与 Troubleshooting。
+  - 补充 Windows PowerShell 可复制命令，覆盖 venv、依赖安装、ingest、query、evaluate、Dashboard 启动。
+  - 补充 `settings.yaml` 主要字段说明，并提供 OpenAI、Azure OpenAI、Ollama 配置片段。
+  - 补充 GitHub Copilot `mcp.json` 与 Claude Desktop `claude_desktop_config.json` stdio 配置示例。
+  - 补充 Dashboard 六页面功能说明、测试命令与常见问题排查表。
 - **测试方法**：按 README 手动走一遍。
 
 ### I4：清理接口一致性（契约测试补齐）
