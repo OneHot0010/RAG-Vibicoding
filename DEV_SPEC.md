@@ -2054,7 +2054,7 @@ dashboard:
 
 | 任务编号 | 任务名称 | 状态 | 完成日期 | 备注 |
 |---------|---------|------|---------|------|
-| I1 | E2E：MCP Client 侧调用模拟 | [ ] | | |
+| I1 | E2E：MCP Client 侧调用模拟 | [x] | 2026-05-09 | Long-lived stdio MCP client simulation + initialize/tools/list/query_knowledge_hub tools/call + citations assertions |
 | I2 | E2E：Dashboard 冒烟测试 | [ ] | | |
 | I3 | 完善 README（运行说明 + MCP + Dashboard） | [ ] | | |
 | I4 | 清理接口一致性（契约测试补齐） | [ ] | | |
@@ -2074,8 +2074,8 @@ dashboard:
 | 阶段 F | 5 | 5 | 100% |
 | 阶段 G | 6 | 6 | 100% |
 | 阶段 H | 5 | 5 | 100% |
-| 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **63** | **93%** |
+| 阶段 I | 5 | 1 | 20% |
+| **总计** | **68** | **64** | **94%** |
 
 
 ---
@@ -3260,10 +3260,16 @@ dashboard:
 
 ## 阶段 I：端到端验收与文档收口（目标：开箱即用的"可复现"工程）
 
-### I1：E2E：MCP Client 侧调用模拟
+### I1：E2E：MCP Client 侧调用模拟 ✅
 - **目标**：实现 `tests/e2e/test_mcp_client.py`：以子进程启动 server，模拟 tools/list + tools/call。
 - **修改文件**：
   - `tests/e2e/test_mcp_client.py`
+- **完成内容**：
+  - 新增 `tests/e2e/test_mcp_client.py`，以 `subprocess.Popen` 启动长生命周期 MCP stdio server。
+  - 实现轻量 JSON-RPC client，连续发送 `initialize`、`notifications/initialized`、`tools/list`、`tools/call`。
+  - 通过临时 PDF + 真实 `scripts/ingest.py` 构建本地知识库，再调用 `query_knowledge_hub`。
+  - 断言 `tools/list` 暴露 `query_knowledge_hub` / `list_collections`，查询结果包含 Markdown 引用与 structured citations。
+  - 校验 query trace 写入、server 正常退出，并确认日志仅出现在 stderr，不污染 stdout JSON-RPC 响应。
 - **验收标准**：完整走通 query_knowledge_hub 并返回 citations。
 - **测试方法**：`pytest -q tests/e2e/test_mcp_client.py`。
 
