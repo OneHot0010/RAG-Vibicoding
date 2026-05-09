@@ -68,6 +68,7 @@ Spec-driven RAG and MCP knowledge hub. The current milestone has completed the L
 - `H4` evaluation panel: Dashboard backend/test-set controls, EvalRunner service wrapper, metrics table/cards, case details, and page tests.
 - `H5` recall regression: E2E ingest-to-evaluate recall test with generated PDFs, custom evaluator threshold, and golden source assertions.
 - `I1` MCP client E2E: long-lived stdio subprocess client simulation covering initialize, tools/list, query_knowledge_hub tools/call, citations, and stderr-only logs.
+- `I2` Dashboard smoke E2E: seeded Dashboard data fixture, all six pages render without Python errors, and optional Streamlit AppTest coverage when Streamlit is installed.
 
 ## Quick Check
 

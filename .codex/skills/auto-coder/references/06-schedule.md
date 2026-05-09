@@ -145,7 +145,7 @@
 | 任务编号 | 任务名称 | 状态 | 完成日期 | 备注 |
 |---------|---------|------|---------|------|
 | I1 | E2E：MCP Client 侧调用模拟 | [x] | 2026-05-09 | Long-lived stdio MCP client simulation + initialize/tools/list/query_knowledge_hub tools/call + citations assertions |
-| I2 | E2E：Dashboard 冒烟测试 | [ ] | | |
+| I2 | E2E：Dashboard 冒烟测试 | [x] | 2026-05-09 | Seeded Dashboard six-page smoke rendering + optional Streamlit AppTest coverage + no Python exceptions |
 | I3 | 完善 README（运行说明 + MCP + Dashboard） | [ ] | | |
 | I4 | 清理接口一致性（契约测试补齐） | [ ] | | |
 | I5 | 全链路 E2E 验收 | [ ] | | |
@@ -164,8 +164,8 @@
 | 阶段 F | 5 | 5 | 100% |
 | 阶段 G | 6 | 6 | 100% |
 | 阶段 H | 5 | 5 | 100% |
-| 阶段 I | 5 | 1 | 20% |
-| **总计** | **68** | **64** | **94%** |
+| 阶段 I | 5 | 2 | 40% |
+| **总计** | **68** | **65** | **96%** |
 
 
 ---
@@ -1363,13 +1363,18 @@
 - **验收标准**：完整走通 query_knowledge_hub 并返回 citations。
 - **测试方法**：`pytest -q tests/e2e/test_mcp_client.py`。
 
-### I2：E2E：Dashboard 冒烟测试
+### I2：E2E：Dashboard 冒烟测试 ✅
 - **目标**：验证 Dashboard 各页面在有数据时可正常渲染、无 Python 异常。
 - **修改文件**：
   - `tests/e2e/test_dashboard_smoke.py`（新增）
 - **实现要点**：
   - 使用 Streamlit 的 `AppTest` 框架进行自动化冒烟测试
   - 验证 6 个页面均可加载、不抛异常
+- **完成内容**：
+  - 新增 `tests/e2e/test_dashboard_smoke.py`，构造临时 settings、Chroma records、ingestion history、golden test set 与 ingestion/query traces。
+  - 覆盖 Overview、Data Browser、Ingestion Manager、Ingestion Traces、Query Traces、Evaluation 六个页面的有数据渲染路径。
+  - 提供 `RecordingStreamlit` 轻量 UI recorder，在缺少 Streamlit 可选依赖时仍能验证页面渲染无 Python 异常。
+  - 增加 Streamlit `AppTest` 冒烟测试；当环境安装 Streamlit 时自动渲染六页组合 app 并断言无异常。
 - **验收标准**：所有页面冒烟测试通过。
 - **测试方法**：`pytest -q tests/e2e/test_dashboard_smoke.py`。
 
