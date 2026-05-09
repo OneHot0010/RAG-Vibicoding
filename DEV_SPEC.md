@@ -2057,7 +2057,7 @@ dashboard:
 | I1 | E2E：MCP Client 侧调用模拟 | [x] | 2026-05-09 | Long-lived stdio MCP client simulation + initialize/tools/list/query_knowledge_hub tools/call + citations assertions |
 | I2 | E2E：Dashboard 冒烟测试 | [x] | 2026-05-09 | Seeded Dashboard six-page smoke rendering + optional Streamlit AppTest coverage + no Python exceptions |
 | I3 | 完善 README（运行说明 + MCP + Dashboard） | [x] | 2026-05-09 | Quick start + config guide + CLI/MCP/Dashboard usage + tests + troubleshooting |
-| I4 | 清理接口一致性（契约测试补齐） | [ ] | | |
+| I4 | 清理接口一致性（契约测试补齐） | [x] | 2026-05-09 | VectorStore/Reranker/Evaluator/DocumentManager boundary contracts + explicit blank backend validation |
 | I5 | 全链路 E2E 验收 | [ ] | | |
 
 ---
@@ -2074,8 +2074,8 @@ dashboard:
 | 阶段 F | 5 | 5 | 100% |
 | 阶段 G | 6 | 6 | 100% |
 | 阶段 H | 5 | 5 | 100% |
-| 阶段 I | 5 | 3 | 60% |
-| **总计** | **68** | **66** | **97%** |
+| 阶段 I | 5 | 4 | 80% |
+| **总计** | **68** | **67** | **99%** |
 
 
 ---
@@ -3307,12 +3307,18 @@ dashboard:
   - 补充 Dashboard 六页面功能说明、测试命令与常见问题排查表。
 - **测试方法**：按 README 手动走一遍。
 
-### I4：清理接口一致性（契约测试补齐）
+### I4：清理接口一致性（契约测试补齐） ✅
 - **目标**：为关键抽象（VectorStore / Reranker / Evaluator / DocumentManager）补齐契约测试。
 - **修改文件**：
   - `tests/unit/test_vector_store_contract.py`（补齐 delete_by_metadata 边界）
   - `tests/unit/test_reranker_factory.py`（补齐边界）
   - `tests/unit/test_custom_evaluator.py`（补齐边界）
+- **完成内容**：
+  - 补齐 VectorStore query/filter/top_k 边界与空 backend 工厂错误契约。
+  - 补齐 NoneReranker 空候选、重复候选 id、空 backend 工厂错误契约。
+  - 补齐 CustomEvaluator 空 retrieved、重复命中明细、显式空 backend 工厂错误契约。
+  - 补齐 DocumentManager 删除时 collection filter 隔离、缺失文档 no-op、空 source_path 错误契约。
+  - 修正 `EvaluatorFactory.create(..., backend="")`：只有 `backend=None` 表示使用默认后端，显式空字符串会报可读配置错误。
 - **验收标准**：`pytest -q` 全绿，且 contract tests 覆盖主要输入输出形状。
 - **测试方法**：`pytest -q`。
 

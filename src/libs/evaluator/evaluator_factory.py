@@ -69,7 +69,7 @@ class EvaluatorFactory:
                 NamedEvaluator(cls._normalize_backend(name), cls._create_one(evaluation_settings, name))
                 for name in evaluation_settings.backends
             )
-        selected_backend = backend or _first_backend(evaluation_settings)
+        selected_backend = _first_backend(evaluation_settings) if backend is None else backend
         return cls._create_one(evaluation_settings, selected_backend)
 
     @classmethod

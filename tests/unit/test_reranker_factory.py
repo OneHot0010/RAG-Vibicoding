@@ -94,6 +94,24 @@ def test_none_reranker_preserves_order_and_scores() -> None:
     ]
 
 
+def test_none_reranker_empty_candidates_returns_empty_list() -> None:
+    assert NoneReranker().rerank("query", []) == []
+
+
+def test_none_reranker_preserves_duplicate_candidate_ids() -> None:
+    candidates = [
+        RerankCandidate(id="same", text="first", score=0.1),
+        RerankCandidate(id="same", text="second", score=0.2),
+    ]
+
+    results = NoneReranker().rerank("query", candidates)
+
+    assert [(result.id, result.text, result.rank) for result in results] == [
+        ("same", "first", 1),
+        ("same", "second", 2),
+    ]
+
+
 def test_factory_returns_none_reranker_by_default_backend() -> None:
     reranker = RerankerFactory.create(RerankSettings(backend="none"))
 
@@ -142,6 +160,12 @@ def test_fake_reranker_can_change_order() -> None:
 def test_factory_unknown_backend_has_readable_error() -> None:
     with pytest.raises(RerankerFactoryError, match="Unknown reranker backend: missing"):
         RerankerFactory.create(RerankSettings(backend="missing"))
+
+
+@pytest.mark.parametrize("backend", ["", "   "])
+def test_factory_rejects_blank_backend_name(backend: str) -> None:
+    with pytest.raises(RerankerFactoryError, match="backend name is required"):
+        RerankerFactory.create(RerankSettings(backend=backend))
 
 
 def test_register_requires_callable_builder() -> None:

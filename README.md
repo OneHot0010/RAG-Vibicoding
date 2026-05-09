@@ -255,6 +255,6 @@ The Streamlit AppTest smoke path is optional and is skipped when `streamlit` is 
 
 ## Current Status
 
-- Completed: scaffold, config loading, pluggable Libs providers, ingestion pipeline, query pipeline, MCP tools, observability, Dashboard pages, evaluation runner, and E2E checks for recall, MCP client, and Dashboard smoke.
-- Current progress: Stage I is 2/5 complete; total progress is 65/68.
+- Completed: scaffold, config loading, pluggable Libs providers, ingestion pipeline, query pipeline, MCP tools, observability, Dashboard pages, evaluation runner, E2E checks, README usage guide, and contract boundary coverage.
+- Current progress: Stage I is 4/5 complete; total progress is 67/68.
 - Source of truth: [DEV_SPEC.md](DEV_SPEC.md).

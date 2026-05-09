@@ -156,6 +156,57 @@ def test_document_manager_delete_document_updates_all_local_stores(tmp_path: Pat
     assert SQLiteIntegrityChecker(tmp_path / "db" / "ingestion_history.db").get_record("hash-a") is None
 
 
+def test_document_manager_delete_respects_collection_filter(tmp_path: Path) -> None:
+    seed_document(tmp_path)
+    records_path = tmp_path / "db" / "chroma" / "records.json"
+    records = json.loads(records_path.read_text(encoding="utf-8"))
+    records.append(
+        {
+            "id": "vec-a-other",
+            "vector": [1.0, 1.0],
+            "text": "same source in other collection",
+            "metadata": {
+                "source_path": "docs/a.pdf",
+                "collection": "other",
+                "file_hash": "hash-a-other",
+                "chunk_index": 0,
+                "original_chunk_id": "chunk-a-other",
+            },
+        }
+    )
+    records_path.write_text(json.dumps(records), encoding="utf-8")
+
+    result = DocumentManager(tmp_path).delete_document("docs/a.pdf", collection="docs").to_dict()
+
+    assert result["vector_deleted"] == 2
+    remaining_vectors = json.loads(records_path.read_text(encoding="utf-8"))
+    assert [record["id"] for record in remaining_vectors] == ["vec-c", "vec-a-other"]
+
+
+def test_document_manager_delete_missing_document_is_noop(tmp_path: Path) -> None:
+    seed_document(tmp_path)
+
+    result = DocumentManager(tmp_path).delete_document("docs/missing.pdf", collection="docs").to_dict()
+
+    assert result == {
+        "source_path": "docs/missing.pdf",
+        "collection": "docs",
+        "vector_deleted": 0,
+        "bm25_deleted": 0,
+        "image_deleted": 0,
+        "integrity_deleted": 0,
+    }
+
+
+def test_document_manager_rejects_blank_delete_source_path(tmp_path: Path) -> None:
+    try:
+        DocumentManager(tmp_path).delete_document("   ")
+    except ValueError as exc:
+        assert "source_path must be a non-empty string" in str(exc)
+    else:
+        raise AssertionError("expected ValueError")
+
+
 def test_document_manager_missing_detail_has_readable_error(tmp_path: Path) -> None:
     try:
         DocumentManager(tmp_path).get_document_detail("missing")

@@ -124,6 +124,27 @@ def test_vector_store_upsert_and_query_contract() -> None:
     ]
 
 
+def test_query_filter_mismatch_returns_empty_list() -> None:
+    store = FakeVectorStore(VectorStoreSettings(backend="fake", persist_path="./tmp/vector"))
+    store.upsert([VectorRecord(id="a", vector=[1.0], text="alpha", metadata={"collection": "docs"})])
+
+    assert store.query([1.0], top_k=5, filters={"collection": "missing"}) == []
+
+
+def test_query_top_k_larger_than_matches_returns_all_matches() -> None:
+    store = FakeVectorStore(VectorStoreSettings(backend="fake", persist_path="./tmp/vector"))
+    store.upsert(
+        [
+            VectorRecord(id="a", vector=[1.0, 0.0], text="alpha", metadata={"collection": "docs"}),
+            VectorRecord(id="b", vector=[0.0, 1.0], text="beta", metadata={"collection": "docs"}),
+        ]
+    )
+
+    results = store.query([1.0, 0.0], top_k=10, filters={"collection": "docs"})
+
+    assert [result.id for result in results] == ["a", "b"]
+
+
 def test_upsert_is_idempotent_by_record_id() -> None:
     store = FakeVectorStore(VectorStoreSettings(backend="fake", persist_path="./tmp/vector"))
     store.upsert([VectorRecord(id="a", vector=[1.0], text="old")])
@@ -178,6 +199,12 @@ def test_factory_unknown_backend_has_readable_error() -> None:
 
     with pytest.raises(VectorStoreFactoryError, match="Unknown vector store backend: missing"):
         VectorStoreFactory.create(VectorStoreSettings(backend="missing", persist_path="./tmp/vector"))
+
+
+@pytest.mark.parametrize("backend", ["", "   "])
+def test_factory_rejects_blank_backend_name(backend: str) -> None:
+    with pytest.raises(VectorStoreFactoryError, match="backend name is required"):
+        VectorStoreFactory.create(VectorStoreSettings(backend=backend, persist_path="./tmp/vector"))
 
 
 def test_register_requires_callable_builder() -> None:

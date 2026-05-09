@@ -105,6 +105,28 @@ def test_custom_evaluator_no_hit() -> None:
     assert result.details["matched_ids"] == []
 
 
+def test_custom_evaluator_empty_retrieved_ids_is_no_hit() -> None:
+    result = CustomEvaluator().evaluate(
+        EvaluationCase(query="config", retrieved_ids=[], golden_ids=["doc-a"])
+    )
+
+    assert result.metrics["hit_rate"] == 0.0
+    assert result.metrics["mrr"] == 0.0
+    assert result.metrics["retrieved_count"] == 0.0
+    assert result.metrics["golden_count"] == 1.0
+    assert result.details["matched_ids"] == []
+
+
+def test_custom_evaluator_duplicate_retrieved_hits_preserve_detail_order() -> None:
+    result = CustomEvaluator().evaluate(
+        EvaluationCase(query="config", retrieved_ids=["doc-a", "doc-a", "doc-b"], golden_ids=["doc-a"])
+    )
+
+    assert result.metrics["hit_rate"] == 1.0
+    assert result.metrics["mrr"] == 1.0
+    assert result.details["matched_ids"] == ["doc-a", "doc-a"]
+
+
 def test_custom_evaluator_empty_golden_set_is_no_hit() -> None:
     result = CustomEvaluator().evaluate(
         EvaluationCase(query="config", retrieved_ids=["doc-x"], golden_ids=[])
@@ -146,6 +168,12 @@ def test_factory_unknown_backend_has_readable_error() -> None:
         EvaluatorFactory.create(
             EvaluationSettings(backends=["missing"], golden_test_set="./golden.json")
         )
+
+
+@pytest.mark.parametrize("backend", ["", "   "])
+def test_factory_rejects_blank_explicit_backend_name(backend: str) -> None:
+    with pytest.raises(EvaluatorFactoryError, match="backend name is required"):
+        EvaluatorFactory.create(EvaluationSettings(backends=["custom"], golden_test_set="./golden.json"), backend=backend)
 
 
 def test_factory_requires_at_least_one_backend() -> None:
