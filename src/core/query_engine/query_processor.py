@@ -56,6 +56,8 @@ class QueryProcessor:
         if not keywords:
             keywords = self.extract_keywords(query)
         if not keywords:
+            keywords = _non_ascii_keyword_fallback(normalized_query)
+        if not keywords:
             raise QueryProcessorError("query produced no keywords")
 
         result = ProcessedQuery(
@@ -116,6 +118,15 @@ def _normalize_filters(filters: Mapping[str, Any] | None) -> dict[str, Any]:
 
 def _normalize_query_text(query: str) -> str:
     return re.sub(r"\s+", " ", query).strip()
+
+
+def _non_ascii_keyword_fallback(query: str) -> list[str]:
+    normalized = _normalize_query_text(query)
+    if not normalized:
+        return []
+    if any(not char.isascii() and not char.isspace() for char in normalized):
+        return [normalized]
+    return []
 
 
 def _coerce_filter_value(value: str) -> str | bool | int | float:

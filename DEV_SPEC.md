@@ -2058,7 +2058,7 @@ dashboard:
 | I2 | E2E：Dashboard 冒烟测试 | [x] | 2026-05-09 | Seeded Dashboard six-page smoke rendering + optional Streamlit AppTest coverage + no Python exceptions |
 | I3 | 完善 README（运行说明 + MCP + Dashboard） | [x] | 2026-05-09 | Quick start + config guide + CLI/MCP/Dashboard usage + tests + troubleshooting |
 | I4 | 清理接口一致性（契约测试补齐） | [x] | 2026-05-09 | VectorStore/Reranker/Evaluator/DocumentManager boundary contracts + explicit blank backend validation |
-| I5 | 全链路 E2E 验收 | [ ] | | |
+| I5 | 全链路 E2E 验收 | [x] | 2026-05-09 | Final ingest + CLI query + MCP query + Dashboard model + evaluate acceptance, including Chinese query fallback |
 
 ---
 
@@ -2074,8 +2074,8 @@ dashboard:
 | 阶段 F | 5 | 5 | 100% |
 | 阶段 G | 6 | 6 | 100% |
 | 阶段 H | 5 | 5 | 100% |
-| 阶段 I | 5 | 4 | 80% |
-| **总计** | **68** | **67** | **99%** |
+| 阶段 I | 5 | 5 | 100% |
+| **总计** | **68** | **68** | **100%** |
 
 
 ---
@@ -3322,9 +3322,18 @@ dashboard:
 - **验收标准**：`pytest -q` 全绿，且 contract tests 覆盖主要输入输出形状。
 - **测试方法**：`pytest -q`。
 
-### I5：全链路 E2E 验收
+### I5：全链路 E2E 验收 ✅
 - **目标**：执行完整的端到端验收流程：ingest → query via MCP → Dashboard 可视化 → evaluate。
-- **修改文件**：无新文件，验收已有功能
+- **修改文件**：
+  - `tests/e2e/test_recall.py`（补充最终全链路验收用例）
+  - `tests/fixtures/sample_documents/acceptance.pdf`（补齐 README/DEV_SPEC 可运行 PDF fixture）
+  - `src/core/query_engine/query_processor.py`（非 ASCII 查询关键词回退）
+  - `tests/unit/test_query_processor.py`（中文查询回退覆盖）
+- **完成内容**：
+  - 补齐 sample_documents 下的最小 PDF fixture，使 `scripts/ingest.py --path tests/fixtures/sample_documents --collection test` 可直接成功。
+  - 新增最终 E2E 验收用例：实际跑 `scripts/ingest.py`、`scripts/query.py --verbose`、MCP `query_knowledge_hub`、Dashboard 数据/追踪/评估模型、`scripts/evaluate.py`。
+  - 验证 MCP 查询返回 citations，Dashboard 可读取摄取与查询 trace，evaluate 输出 `hit_rate=1.0`。
+  - 修复中文查询 `"测试查询"` 的关键词处理：当英文 tokenizer 无结果且查询包含非 ASCII 字符时，以整句作为 fallback keyword，保证 dense retrieval 链路可继续执行。
 - **验收标准**：
   - `python scripts/ingest.py --path tests/fixtures/sample_documents/ --collection test` 成功
   - `python scripts/query.py --query "测试查询" --verbose` 返回结果

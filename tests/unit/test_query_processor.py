@@ -60,6 +60,13 @@ def test_result_serializes_stable_shape() -> None:
     }
 
 
+def test_non_ascii_query_falls_back_to_whole_query_keyword() -> None:
+    result = QueryProcessor().process("测试查询")
+
+    assert result.normalized_query == "测试查询"
+    assert result.keywords == ["测试查询"]
+
+
 def test_trace_records_keyword_count_and_filters() -> None:
     trace = TraceContext()
 

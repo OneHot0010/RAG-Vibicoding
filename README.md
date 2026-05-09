@@ -2,7 +2,7 @@
 
 Spec-driven local RAG and MCP knowledge hub. It ingests local PDF files, builds dense and BM25 indexes, exposes a query CLI, serves MCP tools over stdio, and provides a Streamlit Dashboard for browsing documents, traces, and evaluation results.
 
-Current implementation status: **65/68 tasks complete (96%)**. The remaining stage focuses on README polish, contract cleanup, and final end-to-end acceptance.
+Current implementation status: **68/68 tasks complete (100%)**. The project now has the local RAG, MCP, Dashboard, observability, evaluation, and end-to-end acceptance paths in place.
 
 ## Quick Start
 
@@ -255,6 +255,6 @@ The Streamlit AppTest smoke path is optional and is skipped when `streamlit` is 
 
 ## Current Status
 
-- Completed: scaffold, config loading, pluggable Libs providers, ingestion pipeline, query pipeline, MCP tools, observability, Dashboard pages, evaluation runner, E2E checks, README usage guide, and contract boundary coverage.
-- Current progress: Stage I is 4/5 complete; total progress is 67/68.
+- Completed: scaffold, config loading, pluggable Libs providers, ingestion pipeline, query pipeline, MCP tools, observability, Dashboard pages, evaluation runner, E2E checks, README usage guide, contract boundary coverage, and final full-chain acceptance.
+- Current progress: Stage I is 5/5 complete; total progress is 68/68.
 - Source of truth: [DEV_SPEC.md](DEV_SPEC.md).
