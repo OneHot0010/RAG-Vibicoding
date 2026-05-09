@@ -9,6 +9,7 @@ import pytest
 
 from core.settings import EmbeddingSettings
 from libs.embedding import (
+    ArkEmbedding,
     AzureEmbedding,
     EmbeddingFactory,
     EmbeddingProviderError,
@@ -21,6 +22,8 @@ def register_default_providers() -> None:
     EmbeddingFactory.clear()
     EmbeddingFactory.register("openai", OpenAIEmbedding)
     EmbeddingFactory.register("azure", AzureEmbedding)
+    EmbeddingFactory.register("ark", ArkEmbedding)
+    EmbeddingFactory.register("volcengine", ArkEmbedding)
 
 
 def test_openai_embedding_posts_expected_payload(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -103,6 +106,43 @@ def test_factory_routes_builtin_embedding_providers() -> None:
         ),
         AzureEmbedding,
     )
+    assert isinstance(
+        EmbeddingFactory.create(
+            EmbeddingSettings(provider="ark", model="ep-embedding")
+        ),
+        ArkEmbedding,
+    )
+    assert isinstance(
+        EmbeddingFactory.create(
+            EmbeddingSettings(provider="volcengine", model="ep-embedding")
+        ),
+        ArkEmbedding,
+    )
+
+
+def test_ark_embedding_posts_expected_openai_compatible_payload(monkeypatch: pytest.MonkeyPatch) -> None:
+    captured: dict[str, Any] = {}
+
+    def fake_post(
+        self: ArkEmbedding,
+        url: str,
+        payload: dict[str, Any],
+        headers: dict[str, str],
+    ) -> dict[str, Any]:
+        captured.update(url=url, payload=payload, headers=headers)
+        return {"data": [{"embedding": [0.5, 0.6]}]}
+
+    monkeypatch.setattr(ArkEmbedding, "_post_json", fake_post)
+    embedding = EmbeddingFactory.create(
+        EmbeddingSettings(provider="ark", model="ep-embedding", api_key="ark-secret")
+    )
+
+    vectors = embedding.embed(["hello"])
+
+    assert vectors == [[0.5, 0.6]]
+    assert captured["url"] == "https://ark.cn-beijing.volces.com/api/v3/embeddings"
+    assert captured["payload"] == {"model": "ep-embedding", "input": ["hello"]}
+    assert captured["headers"]["Authorization"] == "Bearer ark-secret"
 
 
 def test_azure_embedding_requires_endpoint() -> None:

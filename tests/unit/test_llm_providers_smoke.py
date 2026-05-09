@@ -7,7 +7,7 @@ from typing import Any
 import pytest
 
 from core.settings import LLMSettings
-from libs.llm import AzureLLM, ChatMessage, DeepSeekLLM, LLMFactory, LLMProviderError, OpenAILLM
+from libs.llm import ArkLLM, AzureLLM, ChatMessage, DeepSeekLLM, LLMFactory, LLMProviderError, OpenAILLM
 
 
 @pytest.fixture(autouse=True)
@@ -15,6 +15,8 @@ def register_default_providers() -> None:
     LLMFactory.clear()
     LLMFactory.register("openai", OpenAILLM)
     LLMFactory.register("azure", AzureLLM)
+    LLMFactory.register("ark", ArkLLM)
+    LLMFactory.register("volcengine", ArkLLM)
     LLMFactory.register("deepseek", DeepSeekLLM)
 
 
@@ -98,6 +100,49 @@ def test_azure_llm_requires_endpoint() -> None:
         llm.chat([{"role": "user", "content": "Hi"}])
 
 
+def test_ark_llm_uses_openai_compatible_ark_endpoint(monkeypatch: pytest.MonkeyPatch) -> None:
+    captured: dict[str, Any] = {}
+
+    def fake_post(self: ArkLLM, url: str, payload: dict[str, Any], headers: dict[str, str]) -> dict[str, Any]:
+        captured.update(url=url, payload=payload, headers=headers)
+        return {"choices": [{"message": {"content": "ark answer"}}]}
+
+    monkeypatch.setattr(ArkLLM, "_post_json", fake_post)
+    llm = LLMFactory.create(
+        LLMSettings(provider="ark", model="ep-20260509-demo", api_key="ark-secret")
+    )
+
+    response = llm.chat([{"role": "user", "content": "Hi"}])
+
+    assert response == "ark answer"
+    assert captured["url"] == "https://ark.cn-beijing.volces.com/api/v3/chat/completions"
+    assert captured["payload"] == {
+        "model": "ep-20260509-demo",
+        "messages": [{"role": "user", "content": "Hi"}],
+    }
+    assert captured["headers"]["Authorization"] == "Bearer ark-secret"
+
+
+def test_ark_llm_accepts_custom_base_url_and_volcengine_alias(monkeypatch: pytest.MonkeyPatch) -> None:
+    captured: dict[str, Any] = {}
+
+    def fake_post(self: ArkLLM, url: str, payload: dict[str, Any], headers: dict[str, str]) -> dict[str, Any]:
+        captured["url"] = url
+        return {"choices": [{"message": {"content": "ok"}}]}
+
+    monkeypatch.setattr(ArkLLM, "_post_json", fake_post)
+    llm = LLMFactory.create(
+        LLMSettings(
+            provider="volcengine",
+            model="ep-custom",
+            base_url="https://ark-custom.example.com/api/v3",
+        )
+    )
+
+    assert llm.chat([{"role": "user", "content": "Hi"}]) == "ok"
+    assert captured["url"] == "https://ark-custom.example.com/api/v3/chat/completions"
+
+
 def test_message_shape_error_mentions_provider_and_field() -> None:
     llm = OpenAILLM(LLMSettings(provider="openai", model="gpt-4o-mini"))
 
@@ -129,3 +174,5 @@ def test_factory_routes_builtin_provider_names() -> None:
         AzureLLM,
     )
     assert isinstance(LLMFactory.create(LLMSettings(provider="deepseek", model="deepseek-chat")), DeepSeekLLM)
+    assert isinstance(LLMFactory.create(LLMSettings(provider="ark", model="ep-demo")), ArkLLM)
+    assert isinstance(LLMFactory.create(LLMSettings(provider="volcengine", model="ep-demo")), ArkLLM)

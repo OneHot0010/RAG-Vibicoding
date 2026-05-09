@@ -52,9 +52,9 @@ Important sections:
 
 | Section | Purpose |
 | --- | --- |
-| `llm` | Chat model provider for LLM-backed features such as LLM reranking. Supported providers include `openai`, `azure`, `deepseek`, and `ollama`. |
-| `embedding` | Online embedding provider when `--online-embedding` is used. The offline CLI path uses local hash embeddings instead. |
-| `vision_llm` | Vision-capable model used by optional image captioning flows. |
+| `llm` | Chat model provider for LLM-backed features such as LLM reranking. Supported providers include `openai`, `azure`, `ark`/`volcengine`, `deepseek`, and `ollama`. |
+| `embedding` | Online embedding provider when `--online-embedding` is used. Supported providers include `openai`, `azure`, `ark`/`volcengine`, and `ollama`. The offline CLI path uses local hash embeddings instead. |
+| `vision_llm` | Vision-capable model used by optional image captioning flows. Supported providers include `azure` and OpenAI-compatible `ark`/`volcengine`. |
 | `splitter` | Chunking strategy and `chunk_size` / `chunk_overlap`. |
 | `vector_store` | Vector backend and persistence path. The default backend is local JSON-backed `chroma` under `data/db/chroma`. |
 | `retrieval` | Dense/sparse top-k settings and RRF fusion behavior. |
@@ -89,6 +89,27 @@ llm:
   api_version: "2024-02-15-preview"
 ```
 
+Example Volcengine Ark settings:
+
+```yaml
+llm:
+  provider: ark
+  model: ep-xxxxxxxxxxxxxxxx
+  api_key: ${ARK_API_KEY}
+  # Optional; defaults to https://ark.cn-beijing.volces.com/api/v3
+  base_url: https://ark.cn-beijing.volces.com/api/v3
+
+embedding:
+  provider: ark
+  model: ep-yyyyyyyyyyyyyyyy
+  api_key: ${ARK_API_KEY}
+
+vision_llm:
+  provider: ark
+  model: ep-zzzzzzzzzzzzzzzz
+  api_key: ${ARK_API_KEY}
+```
+
 Example Ollama settings:
 
 ```yaml
@@ -97,6 +118,21 @@ llm:
   model: llama3.1
   base_url: http://localhost:11434
 ```
+
+## Model Usage Map
+
+All model access goes through provider abstractions under `src/libs`.
+
+| Area | Code path | Model type | Ark support |
+| --- | --- | --- | --- |
+| Optional chunk refinement | `ingestion.transform.ChunkRefiner` -> `LLMFactory.create()` | Chat LLM | `llm.provider: ark` |
+| Optional metadata enrichment | `ingestion.transform.MetadataEnricher` -> `LLMFactory.create()` | Chat LLM | `llm.provider: ark` |
+| Optional image captioning | `ingestion.transform.ImageCaptioner` -> `LLMFactory.create_vision_llm()` | Vision LLM | `vision_llm.provider: ark` |
+| Dense encoding during ingestion | `ingestion.embedding.DenseEncoder` -> `EmbeddingFactory.create()` | Embedding | `embedding.provider: ark` with `--online-embedding` |
+| Dense retrieval during query | `core.query_engine.DenseRetriever` -> `EmbeddingFactory.create()` | Embedding | `embedding.provider: ark` with `--online-embedding` |
+| MCP query online embedding path | `mcp_server.tools.query_knowledge_hub` | Embedding | `online_embedding: true` plus `embedding.provider: ark` |
+| LLM reranking implementation | `libs.reranker.LLMReranker` | Chat LLM | Use an Ark-backed `BaseLLM` from `LLMFactory` |
+| Dashboard evaluation online embedding path | `observability.dashboard.services.EvaluationService` | Embedding | `online_embedding=True` plus `embedding.provider: ark` |
 
 ## CLI Usage
 
@@ -249,7 +285,7 @@ The Streamlit AppTest smoke path is optional and is skipped when `streamlit` is 
 | `未找到相关文档，请先运行 ingest.py 摄取数据。` | Run `python scripts\ingest.py --path <pdf-or-dir> --collection docs` before querying. |
 | Dashboard says Streamlit is required | Run `python -m pip install streamlit`. |
 | MCP client cannot import `mcp_server` | Set `PYTHONPATH=src` in the MCP client config or install the project with `python -m pip install -e .`. |
-| Online provider returns auth or endpoint errors | Check `api_key`, `azure_endpoint`, `base_url`, `deployment`, and `api_version` in `config/settings.yaml`. |
+| Online provider returns auth or endpoint errors | Check `api_key`, `azure_endpoint`, `base_url`, `deployment`, and `api_version` in `config/settings.yaml`. For Ark, use `provider: ark`, `api_key: ${ARK_API_KEY}`, and the Ark endpoint/model id in `model`. |
 | Query works but reranking fails | Use `--no-rerank` or set `rerank.backend: none` until the selected reranker dependency/provider is configured. |
 | No traces appear in Dashboard | Ensure `observability.enabled: true` and check `observability.log_file`, normally `logs/traces.jsonl`. |
 

@@ -1,14 +1,27 @@
 llm:
   provider: azure
   model: gpt-4o
+  # Volcengine Ark example:
+  # provider: ark
+  # model: ep-xxxxxxxxxxxxxxxx
+  # api_key: ${ARK_API_KEY}
+  # base_url: https://ark.cn-beijing.volces.com/api/v3
 
 embedding:
   provider: openai
   model: text-embedding-3-small
+  # Volcengine Ark example:
+  # provider: ark
+  # model: ep-yyyyyyyyyyyyyyyy
+  # api_key: ${ARK_API_KEY}
 
 vision_llm:
   provider: azure
   model: gpt-4o
+  # Volcengine Ark example:
+  # provider: ark
+  # model: ep-zzzzzzzzzzzzzzzz
+  # api_key: ${ARK_API_KEY}
 
 splitter:
   strategy: recursive
